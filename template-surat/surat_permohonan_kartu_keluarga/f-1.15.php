@@ -1,7 +1,60 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-
+<?php if (!defined('BASEPATH')) exit ('No direct script access allowed');?>
 <style type="text/css">
-	<?php include(FCPATH . "/assets/css/lampiran-surat.css"); ?>
+	table.disdukcapil
+	{
+		width: 100%;
+		border: solid 1px #000000;
+		/*border-collapse: collapse;*/
+	}
+	table.disdukcapil td
+	{
+		padding: 1px 1px 1px 3px;
+	}
+	table.disdukcapil td.padat
+	{
+		padding: 0px;
+		margin: 0px;
+	}
+	table.disdukcapil td.anggota
+	{
+		border-left: solid 1px #000000;
+		border-right: solid 1px #000000;
+		border-top: dashed 1px #000000;
+		border-bottom: dashed 1px #000000;
+	}
+	table.disdukcapil td.judul
+	{
+		border-left: solid 1px #000000;
+		border-right: solid 1px #000000;
+		border-top: double 1px #000000;
+		border-bottom: double 1px #000000;
+	}
+	table.disdukcapil td.bawah {border-bottom: solid 1px #000000;}
+	table.disdukcapil td.atas {border-top: solid 1px #000000;}
+	table.disdukcapil td.tengah_blank
+	{
+		border-left: solid 1px #000000;
+		border-right: solid 1px #000000;
+	}
+	table.disdukcapil td.pinggir_kiri {border-left: solid 1px #000000;}
+	table.disdukcapil td.pinggir_kanan {border-right: solid 1px #000000;}
+	table.disdukcapil td.kotak {border: solid 1px #000000;}
+	table.disdukcapil td.abu {background-color: lightgrey;}
+	table.disdukcapil td.kode {background-color: lightgrey;}
+	table.disdukcapil td.kode div
+	{
+		margin: 0px 15px 0px 15px;
+		border: solid 1px black;
+		background-color: white;
+		text-align: center;
+	}
+	table.disdukcapil td.pakai-padding
+	{
+		padding-left: 20px;
+		padding-right: 2px;
+	}
+	table.disdukcapil td.kanan { text-align: right; }
+	table.disdukcapil td.tengah { text-align: center; }
 </style>
 <page orientation="portrait" format="210x330" style="font-size: 8pt">
 	<table align="right" style="padding: 5px 20px; border: solid 1px black;">
@@ -53,7 +106,7 @@
 			<td colspan=12>&nbsp;</td>
 		</tr>
 
-		<tr>
+		 <tr>
 			<td colspan="13" class=" left"><strong>KECAMATAN</strong></td>
 			<td>:</td>
 			<?php for ($i=0; $i<2; $i++): ?>
@@ -86,8 +139,8 @@
 			<td colspan="17" class="kotak"><?= $config['nama_desa'];?></td>
 			<td colspan=12>&nbsp;</td>
 		</tr>
-		<tr><td colspan="48" class="bawah">&nbsp;</td></tr>
-		<tr><td colspan="48">&nbsp;</td></tr>
+		<tr><td colspan=48 class="bawah">&nbsp;</td></tr>
+		<tr><td colspan=48>&nbsp;</td></tr>
 
 		<tr>
 			<td colspan="10" class="kotak">1. Nama Lengkap Pemohon</td>
@@ -281,7 +334,7 @@
 		<tr><td>&nbsp;</td></tr>
 		<tr>
 			<td colspan="46" style="text-align: right">
-				<?= $config['nama_desa'] ?>, <?= tgl_indo(date('Y-m-d')); ?>
+				<?= str_pad(".",40,".",STR_PAD_LEFT);?>,<?= str_pad(".",60,".",STR_PAD_LEFT);?>
 			</td>
 			<td colspan="2">&nbsp;</td>
 		</tr>
@@ -298,7 +351,7 @@
 			<td>&nbsp;</td>
 			<td colspan="11" style="text-align: center;">Camat</td>
 			<td>&nbsp;</td>
-			<td colspan="13" style="text-align: center;"><?= $penandatangan['atas_nama']?></td>
+			<td colspan="13" style="text-align: center;"><?= $this->penandatangan_lampiran($data);?></td>
 			<td colspan="22">&nbsp;</td>
 		</tr>
 		<tr><td colspan="48">&nbsp;</td></tr>
@@ -307,7 +360,7 @@
 			<td>&nbsp;</td>
 			<td colspan="11"><?= str_pad(".",50,".",STR_PAD_LEFT);?></td>
 			<td>&nbsp;</td>
-			<td colspan="13" style="text-align: center;"><strong>(<?= padded_string_center(strtoupper($penandatangan['nama']),30)?>)</strong></td>
+			<td colspan="13" style="text-align: center;"><strong>(<?= padded_string_center(strtoupper($kepala_desa['nama']),30)?>)</strong></td>
 			<td colspan="9">&nbsp;</td>
 			<td colspan="12" style="text-align: center;"><strong>(<?= padded_string_center(strtoupper($individu['nama']),30)?>)</strong></td>
 			<td>&nbsp;</td>
@@ -316,7 +369,7 @@
 			<td>&nbsp;</td>
 			<td colspan="11" style="text-align: center;"><?= "NIP&nbsp;&nbsp;:&nbsp;".str_pad("",40*6,"&nbsp;",STR_PAD_LEFT)?></td>
 			<td>&nbsp;</td>
-			<td colspan="13" style="text-align: center;"><?= "NIP&nbsp;&nbsp;:&nbsp;".$penandatangan['nip']?></td>
+			<td colspan="13" style="text-align: center;"><?= "NIP&nbsp;&nbsp;:&nbsp;".$kepala_desa['pamong_nip']?></td>
 			<td colspan="22">&nbsp;</td>
 		</tr>
 		<tr><td colspan="48">&nbsp;</td></tr>

@@ -1,8 +1,14 @@
-<?php
-
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 /*
+ *  File ini:
  *
- * File ini bagian dari:
+ * Controller untuk modul Laporan Kependudukan
+ *
+ * donjo-app/controllers/Laporan_rentan.php
+ *
+ */
+/*
+ *  File ini bagian dari:
  *
  * OpenSID
  *
@@ -11,7 +17,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,68 +32,77 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+class Laporan_rentan extends Admin_Controller {
 
-class Laporan_rentan extends Admin_Controller
-{
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model(['laporan_bulanan_model', 'wilayah_model']);
-        $this->modul_ini     = 'statistik';
-        $this->sub_modul_ini = 'laporan-kelompok-rentan';
-    }
+	public function __construct()
+	{
+		parent::__construct();
 
-    public function clear(): void
-    {
-        $session = ['cari', 'filter', 'dusun', 'rw', 'rt'];
-        $this->session->unset_userdata($session);
-        $this->session->per_page = 20;
-        session_error_clear();
+		$this->load->model('laporan_bulanan_model');
+		$this->load->model('config_model');
+		$this->load->model('wilayah_model');
 
-        redirect('laporan_rentan');
-    }
+		//Initialize Session ------------
+		$_SESSION['success'] = 0;
+		$_SESSION['per_page'] = 20;
+		$_SESSION['cari'] = '';
+		//-------------------------------
 
-    public function index(): void
-    {
-        $data['dusun']      = $this->session->dusun ?? '';
-        $data['config']     = $this->header['desa'];
-        $data['list_dusun'] = $this->wilayah_model->list_dusun();
-        $data['main']       = $this->laporan_bulanan_model->list_data();
-        $this->render('laporan/kelompok', $data);
-    }
+		$this->modul_ini = 3;
+		$this->sub_modul_ini = 29;
+	}
 
-    public function cetak(): void
-    {
-        $data['config'] = $this->header['desa'];
-        $data['main']   = $this->laporan_bulanan_model->list_data();
-        $this->load->view('laporan/kelompok_print', $data);
-    }
+	public function clear()
+	{
+		unset($_SESSION['cari']);
+		unset($_SESSION['filter']);
+		unset($_SESSION['dusun']);
+		unset($_SESSION['rw']);
+		unset($_SESSION['rt']);
+		redirect('laporan_rentan');
+	}
 
-    public function excel(): void
-    {
-        $data['config'] = $this->header['desa'];
-        $data['main']   = $this->laporan_bulanan_model->list_data();
-        $this->load->view('laporan/kelompok_excel', $data);
-    }
+	public function index()
+	{
+		if (isset($_SESSION['dusun']))
+			$data['dusun'] = $_SESSION['dusun'];
+		else $data['dusun'] = '';
 
-    public function dusun(): void
-    {
-        $dusun = $this->input->post('dusun');
-        if ($dusun != '') {
-            $this->session->dusun = $dusun;
-        } else {
-            $this->session->unset_userdata('dusun');
-        }
-        redirect('laporan_rentan');
-    }
+		$data['list_dusun'] = $this->wilayah_model->list_dusun();
+		$data['config'] = $this->config_model->get_data();
+		$data['main'] = $this->laporan_bulanan_model->list_data();
+		$this->set_minsidebar(1);
+		$this->render('laporan/kelompok', $data);
+	}
+
+	public function cetak()
+	{
+		$data['config'] = $this->config_model->get_data();
+		$data['main'] = $this->laporan_bulanan_model->list_data();
+		$this->load->view('laporan/kelompok_print', $data);
+	}
+
+	public function excel()
+	{
+		$data['config'] = $this->config_model->get_data();
+		$data['main'] = $this->laporan_bulanan_model->list_data();
+		$this->load->view('laporan/kelompok_excel', $data);
+	}
+
+	public function dusun()
+	{
+		$dusun = $this->input->post('dusun');
+		if ($dusun != "")
+			$_SESSION['dusun'] = $dusun;
+		else unset($_SESSION['dusun']);
+		redirect('laporan_rentan');
+	}
 }

@@ -2,13 +2,13 @@
 	<section class="content-header">
 		<h1>Daftar Inventaris Peralatan Dan Mesin</h1>
 		<ol class="breadcrumb">
-			<li><a href="<?= site_url('beranda')?>"><i class="fa fa-home"></i> Beranda</a></li>
-			<li><a href="<?= site_url('inventaris_peralatan') ?>"><i class="fa fa-dashboard"></i>Daftar Inventaris Peralatan Dan Mesin</a></li>
+			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
+			<li><a href="<?= site_url() ?>inventaris_peralatan"><i class="fa fa-dashboard"></i>Daftar Inventaris Peralatan Dan Mesin</a></li>
 			<li class="active">Isi Data</li>
 		</ol>
 	</section>
 	<section class="content" id="maincontent">
-		<form class="form-horizontal" id="validasi" name="form_peralatan" method="post" action="<?= site_url('api_inventaris_peralatan/add'); ?>">
+		<form class="form-horizontal" id="validasi" name="form_peralatan" method="post" action="<?= site_url("api_inventaris_peralatan/add"); ?>">
 			<div class="row">
 				<div class="col-md-3">
 					<?php $this->load->view('inventaris/menu_kiri'); ?>
@@ -16,13 +16,13 @@
 				<div class="col-md-9">
 					<div class="box box-info">
 						<div class="box-header with-border">
-						<a href="<?= site_url('inventaris_peralatan') ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Daftar Inventaris Peralatan</a>
+						<a href="<?= site_url() ?>inventaris_peralatan" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Daftar Inventaris Peralatan</a>
 						</div>
 						<?php
-                            $reg = $count_reg->count + 1;
-			$jumlah_kata                  = strlen($reg);
-			$hasil                        = sprintf('%06s', $reg);
-			?>
+							$reg = $count_reg->count + 1;
+							$jumlah_kata = strlen($reg);
+							$hasil = sprintf("%06s",$reg);
+						?>
 						<div class="box-body">
 							<div class="row">
 								<div class="col-md-12">
@@ -31,7 +31,7 @@
 										<div class="col-sm-8">
 											 <select class="form-control input-sm select2" id="nama_barang" name="nama_barang" style ="width:100%;" onchange="formAction('main')">
 												<?php foreach ($aset as $data): ?>
-													<option value="<?=  $data['nama'] . '_' . $data['golongan'] . '.' . $data['bidang'] . '.' . $data['kelompok'] . '.' . $data['sub_kelompok'] . '.' . $data['sub_sub_kelompok'] . '.' . $hasil?>">Kode Reg : <?= $data['golongan'] . '.' . $data['bidang'] . '.' . $data['kelompok'] . '.' . $data['sub_kelompok'] . '.' . $data['sub_sub_kelompok'] . ' - ' . $data['nama']?></option>
+													<option value="<?=  $data['nama']."_".$data['golongan'].".".$data['bidang'].".".$data['kelompok'].".".$data['sub_kelompok'].".".$data['sub_sub_kelompok'].".".$hasil?>">Kode Reg : <?= $data['golongan'].".".$data['bidang'].".".$data['kelompok'].".".$data['sub_kelompok'].".".$data['sub_sub_kelompok']." - ".$data['nama']?></option>
 												<?php endforeach; ?>
 											</select>
 										</div>
@@ -40,7 +40,7 @@
 										<label class="col-sm-3 control-label" style="text-align:left;" for="kode_barang">Kode Barang</label>
 										<div class="col-sm-8">
 											<input type="hidden" name="nama_barang_save" id="nama_barang_save">
-											<input type="hidden" name="kode_desa" id="kode_desa" value="<?=kode_wilayah($get_kode['kode_desa'])?>">
+											<input type="hidden" name="kode_desa" id="kode_desa" value="<?=kode_wilayah($get_kode["kode_desa"])?>">
 											<input maxlength="50" class="form-control input-sm required" name="kode_barang" id="kode_barang" type="text"/>
 										</div>
 									</div>
@@ -72,7 +72,7 @@
 										<label class="col-sm-3 control-label" style="text-align:left;" for="tahun_pengadaan">Tahun Pembelian</label>
 										<div class="col-sm-4">
 											<select name="tahun_pengadaan" id="tahun_pengadaan" class="form-control input-sm select2 required">
-												<?php for ($i = date('Y'); $i >= 1900; $i--): ?>
+												<?php for ($i=date("Y"); $i>=1900; $i--): ?>
 													<option value="<?= $i ?>"><?= $i ?></option>
 												<?php endfor; ?>
 											</select>

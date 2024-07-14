@@ -1,16 +1,18 @@
 <?php
 
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
+/**
  * File ini:
  *
  * View untuk cetak/unduh laporan modul Arsip Layanan surat
  *
  * donjo-app/views/surat/cetak.php,
+ *
  */
 
-/*
+/**
+ *
  * File ini bagian dari:
  *
  * OpenSID
@@ -35,11 +37,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @copyright	  Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	  Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- *
- * @see 	https://github.com/OpenSID/OpenSID
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 ?>
 
@@ -50,7 +53,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				<?php if ($aksi != 'unduh'): ?>
 					<img class="logo" src="<?= gambar_desa($config['logo']); ?>" alt="logo-desa">
 				<?php endif; ?>
-				<h1 class="judul">
+				<h1 class="judul"> 
 					PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten'] . ' <br>' . $this->setting->sebutan_kecamatan . ' ' . $config['nama_kecamatan'] . ' <br>' . $this->setting->sebutan_desa . ' ' . $config['nama_desa']); ?>
 				</h1>
 			</td>
@@ -98,7 +101,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 										<?php endif; ?>
 									</td>
 									<td><?= $data['keterangan']?></td>
-									<td><?= $data['pamong_nama']?></td>
+									<td><?= $data['pamong']?></td>
 									<td nowrap><?= tgl_indo($data['tanggal'])?></td>
 									<td><?= $data['nama_user']?></td>
 								</tr>

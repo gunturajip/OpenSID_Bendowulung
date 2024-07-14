@@ -1,6 +1,14 @@
-<?php
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * File ini:
+ *
+ * Controller di Modul Pemetaan
+ *
+ * /donjo-app/controllers/Point.php
+ *
+ */
 
-/*
+/**
  *
  * File ini bagian dari:
  *
@@ -11,212 +19,260 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
  * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
  * asal tunduk pada syarat berikut:
- *
+
  * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
  * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
  * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
+
  * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
+ * @package OpenSID
+ * @author  Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @copyright Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license http://www.gnu.org/licenses/gpl.html  GPL V3
+ * @link  https://github.com/OpenSID/OpenSID
  */
 
-use App\Models\Point as ModelsPoint;
+class Point extends Admin_Controller {
 
-defined('BASEPATH') || exit('No direct script access allowed');
+	public function __construct()
+	{
+		parent::__construct();
 
-class Point extends Admin_Controller
-{
-    public function __construct()
-    {
-        parent::__construct();
+		$this->load->model('plan_point_model');
+		$this->modul_ini = 9;
+		$this->sub_modul_ini = 8;
+	}
 
-        $this->load->model('plan_point_model');
-        $this->modul_ini     = 'pemetaan';
-        $this->sub_modul_ini = 'pengaturan-peta';
-    }
+	public function clear()
+	{
+		unset($_SESSION['cari']);
+		unset($_SESSION['filter']);
+		redirect('point');
+	}
 
-    public function index()
-    {
-        $data['status'] = [
-            ModelsPoint::LOCK   => 'Aktif',
-            ModelsPoint::UNLOCK => 'Non Aktif',
-        ];
+	public function clear_simbol()
+	{
+		redirect('point/form_simbol');
+	}
 
-        return view('admin.peta.point.index', $data);
-    }
+	public function index($p = 1, $o = 0)
+	{
+		$data['p'] = $p;
+		$data['o'] = $o;
 
-    public function datatables()
-    {
-        if ($this->input->is_ajax_request()) {
-            $status   = $this->input->get('status') ?? null;
-            $root     = $this->input->get('root') ?? null;
-            $subpoint = $this->input->get('subpoint') ?? null;
+		if (isset($_SESSION['cari']))
+			$data['cari'] = $_SESSION['cari'];
+		else $data['cari'] = '';
 
-            return datatables()->of(ModelsPoint::query()
-                ->when($root, static fn ($q) => $q->whereTipe(ModelsPoint::ROOT))
-                ->when($status, static fn ($q) => $q->whereEnabled($status))
-                ->when($subpoint, static fn ($q) => $q->whereTipe(ModelsPoint::CHILD)->whereParrent($subpoint)))
-                ->addColumn('ceklist', static function ($row) {
-                    if (can('h')) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
-                    }
-                })
-                ->addIndexColumn()
-                ->addColumn('aksi', static function ($row) use ($root, $subpoint): string {
-                    $aksi = '';
+		if (isset($_SESSION['filter']))
+			$data['filter'] = $_SESSION['filter'];
+		else $data['filter'] = '';
 
-                    if (can('u')) {
-                        if ($root) {
-                            $aksi .= '<a href="' . route('point.form', $row->id) . '/' . $subpoint . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a> ';
-                        } else {
-                            $aksi .= '<a href="' . route('point.ajax_add_sub_point', $subpoint) . '/' . $row->id . '" data-toggle="modal" data-target="#modalBox" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a> ';
-                        }
+		if (isset($_POST['per_page']))
+			$_SESSION['per_page'] = $_POST['per_page'];
+		$data['per_page'] = $_SESSION['per_page'];
 
-                        if ($row->enabled == ModelsPoint::LOCK) {
-                            $aksi .= '<a href="' . route('point.lock') . '/' . $row->id . '/' . ModelsPoint::UNLOCK . '/' . $subpoint . '" class="btn bg-navy btn-sm" title="Nonaktifkan"><i class="fa fa-unlock"></i></a> ';
-                        } else {
-                            $aksi .= '<a href="' . route('point.lock') . '/' . $row->id . '/' . ModelsPoint::LOCK . '/' . $subpoint . '" class="btn bg-navy btn-sm" title="Aktifkan"><i class="fa fa-lock"></i></a> ';
-                        }
-                    }
+		$data['paging'] = $this->plan_point_model->paging($p, $o);
+		$data['main'] = $this->plan_point_model->list_data($o, $data['paging']->offset, $data['paging']->per_page);
+		$data['keyword'] = $this->plan_point_model->autocomplete();
+		
+		$data['tip'] = 0;		
+		$this->set_minsidebar(1);
+		$this->render('point/table', $data);
+	}
 
-                    if ($root) {
-                        $aksi .= '<a href="' . route('point.sub_point', $row->id) . '" class="btn bg-purple btn-sm"  title="Rincian ' . $row->nama . '"><i class="fa fa-bars"></i></a> ';
-                    }
+	public function form($p = 1, $o = 0, $id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$data['p'] = $p;
+		$data['o'] = $o;
 
-                    if (can('h')) {
-                        $aksi .= '<a href="#" data-href="' . route('point.delete', $row->id) . '/' . $subpoint . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
-                    }
+		if ($id)
+		{
+			$data['point'] = $this->plan_point_model->get_point($id);
+			$data['form_action'] = site_url("point/update/$id/$p/$o");
+		}
+		else
+		{
+			$data['point'] = NULL;
+			$data['form_action'] = site_url("point/insert");
+		}
 
-                    return $aksi;
-                })
-                ->editColumn('enabled', static fn ($row): string => $row->enabled == '1' ? 'Ya' : 'Tidak')
-                ->editColumn('path_simbol', static fn ($row): string => '<img src="' . $row->path_simbol . '" />')
-                ->rawColumns(['ceklist', 'aksi', 'simbol', 'path_simbol'])
-                ->make();
-        }
+		$data['simbol'] = $this->plan_point_model->list_simbol();
+		$this->set_minsidebar(1);
+		$data['tip'] = 0;
 
-        return show_404();
-    }
+		$this->render('point/form', $data);
+	}
 
-    public function form($id = '', $subpoint = 0)
-    {
-        $this->redirect_hak_akses('u');
+	public function sub_point($point = 1)
+	{
+		$data['subpoint'] = $this->plan_point_model->list_sub_point($point);
+		$data['point'] = $this->plan_point_model->get_point($point);
+		$this->set_minsidebar(1);
+		$data['tip'] = 0;
 
-        if ($id) {
-            $data['point']       = ModelsPoint::findOrFail($id);
-            $data['form_action'] = route('point.update', $id) . '/' . $subpoint;
-            $data['aksi']        = 'Ubah';
-        } else {
-            $data['point']       = null;
-            $data['aksi']        = 'Tambah';
-            $data['form_action'] = route('point.insert');
-        }
+		$this->render('point/sub_point_table', $data);
+	}
 
-        $data['simbol'] = gis_simbols();
-        $data['tip']    = 0;
+	public function ajax_add_sub_point($point = 0, $id = 0)
+	{
+		if ($id)
+		{
+			$data['point'] = $this->plan_point_model->get_point($id);
+			$data['form_action'] = site_url("point/update_sub_point/$point/$id");
+		}
+		else
+		{
+			$data['point'] = NULL;
+			$data['form_action'] = site_url("point/insert_sub_point/$point");
+		}
 
-        return view('admin.peta.point.form', $data);
-    }
+		$data['simbol'] = $this->plan_point_model->list_simbol();
+		$this->load->view("point/ajax_add_sub_point_form", $data);
+	}
 
-    public function sub_point($point = 1)
-    {
-        $data['subpoint'] = ModelsPoint::child($point)->get()->toArray();
-        $data['point']    = ModelsPoint::findOrFail($point);
-        $data['tip']      = 0;
+	public function search()
+	{
+		$cari = $this->input->post('cari');
+		if ($cari != '')
+			$_SESSION['cari'] = $cari;
+		else unset($_SESSION['cari']);
+		redirect('point');
+	}
 
-        return view('admin.peta.point.subpoint', $data);
-    }
+	public function filter()
+	{
+		$filter = $this->input->post('filter');
+		if ($filter != 0)
+			$_SESSION['filter'] = $filter;
+		else unset($_SESSION['filter']);
+		redirect('point');
+	}
 
-    public function ajax_add_sub_point($point = 0, $id = 0)
-    {
-        if ($id) {
-            $data['point']       = ModelsPoint::findOrFail($id);
-            $data['form_action'] = route('point.update', $id) . '/' . $point;
-        } else {
-            $data['point']       = null;
-            $data['form_action'] = route('point.insert', $point);
-        }
+	public function insert($tip = 1)
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_point_model->insert($tip);
+		redirect("point/index/$tip");
+	}
 
-        $data['simbol'] = gis_simbols();
+	public function update($id = '', $p = 1, $o = 0)
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_point_model->update($id);
+		redirect("point/index/$p/$o");
+	}
 
-        return view('admin.peta.point.subpoint_form', $data);
-    }
+	public function delete($p = 1, $o = 0, $id = '')
+	{
+		$this->redirect_hak_akses('h', "point/index/$p/$o");
+		$this->plan_point_model->delete($id);
+		redirect("point/index/$p/$o");
+	}
 
-    public function insert($subpoint = 0): void
-    {
-        $this->redirect_hak_akses('u');
-        $data  = $this->input->post();
-        $url   = $subpoint ? "point/sub_point/{$subpoint}" : null;
-        $label = $subpoint ? 'Kategori' : 'Tipe';
+	public function delete_all($p = 1, $o = 0)
+	{
+		$this->redirect_hak_akses('h', "point/index/$p/$o");
+		$this->plan_point_model->delete_all();
+		redirect("point/index/$p/$o");
+	}
 
-        try {
-            ModelsPoint::create($this->validasi($data, $subpoint));
-            redirect_with('success', $label . ' Lokasi berhasil disimpan', $url);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', $label . ' Lokasi disimpan', $url);
-        }
-    }
+	public function point_lock($id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_point_model->point_lock($id, 1);
+		redirect("point/index/$p/$o");
+	}
 
-    private function validasi($post, $parent = 0)
-    {
-        $data['nama']    = nomor_surat_keputusan($post['nama']);
-        $data['simbol']  = $post['simbol'];
-        $data['parrent'] = $parent;
-        $data['tipe']    = $parent ? ModelsPoint::CHILD : ModelsPoint::ROOT;
+	public function point_unlock($id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_point_model->point_lock($id, 2);
+		redirect("point/index/$p/$o");
+	}
 
-        return $data;
-    }
+	public function insert_sub_point($point = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_point_model->insert_sub_point($point);
+		redirect("point/sub_point/$point");
+	}
 
-    public function update($id = '', $subpoint = 0): void
-    {
-        $this->redirect_hak_akses('u');
-        $data  = $this->input->post();
-        $url   = $subpoint ? "point/sub_point/{$subpoint}" : null;
-        $label = $subpoint ? 'Kategori' : 'Tipe';
+	public function update_sub_point($point = '', $id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_point_model->update_sub_point($id);
+		redirect("point/sub_point/$point");
+	}
 
-        try {
-            ModelsPoint::findOrFail($id)->update($this->validasi($data, $subpoint));
-            redirect_with('success', $label . ' Lokasi berhasil diubah', $url);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', $label . ' Lokasi diubah', $subpoint);
-        }
-    }
+	public function delete_sub_point($point = '', $id = '')
+	{
+		$this->redirect_hak_akses('h', "point/sub_point/$point");
+		$this->plan_point_model->delete_sub_point($id);
+		redirect("point/sub_point/$point");
+	}
 
-    public function delete($id = '', $subpoint = 0): void
-    {
-        $this->redirect_hak_akses('h');
-        $subpoint = $subpoint ? "point/sub_point/{$subpoint}" : null;
-        if (ModelsPoint::destroy($this->request['id_cb'] ?? $id) !== 0) {
-            redirect_with('success', 'Berhasil Hapus Data', $subpoint);
-        }
+	public function delete_all_sub_point($point = '')
+	{
+		$this->redirect_hak_akses('h', "point/sub_point/$point");
+		$this->plan_point_model->delete_all_sub_point();
+		redirect("point/sub_point/$point");
+	}
 
-        redirect_with('error', 'Gagal Hapus Data', $subpoint);
-    }
+	public function point_lock_sub_point($point = '', $id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_point_model->point_lock($id, 1);
+		redirect("point/sub_point/$point");
+	}
 
-    public function lock($id = 0, $val = 1, $subpoint = 0): void
-    {
-        $this->redirect_hak_akses('u');
-        $subpoint = $subpoint ? "point/sub_point/{$subpoint}" : null;
-        if (ModelsPoint::findOrFail($id)->update(['enabled' => $val])) {
-            redirect_with('success', 'Berhasil Ubah Status', $subpoint);
-        }
-        redirect_with('error', 'Gagal Ubah Status', $subpoint);
-    }
+	public function point_unlock_sub_point($point = '', $id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_point_model->point_lock($id, 2);
+		redirect("point/sub_point/$point");
+	}
+
+	public function tambah_simbol()
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_point_model->tambah_simbol();
+		redirect("point/form_simbol");
+	}
+
+	public function form_simbol($id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$data['simbol'] = $this->plan_point_model->list_simbol();
+		$this->set_minsidebar(1);
+		$data['tip'] = 6;
+
+		$this->render('point/form_simbol', $data);
+	}
+
+	public function delete_simbol($id = '', $simbol = '')
+	{
+		$this->redirect_hak_akses('h');
+		$this->plan_point_model->delete_simbol($id);
+		$this->plan_point_model->delete_simbol_file($simbol);
+		redirect("point/form_simbol");
+	}
+
+	public function salin_simbol_default()
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_point_model->salin_simbol_default();
+		redirect("point/form_simbol");
+	}
 }

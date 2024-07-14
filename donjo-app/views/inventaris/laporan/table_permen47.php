@@ -2,7 +2,7 @@
 	<section class="content-header">
 		<h1>Daftar Inventaris Jalan, Irigasi Dan Jaringan</h1>
 		<ol class="breadcrumb">
-			<li><a href="<?= site_url('beranda')?>"><i class="fa fa-home"></i> Beranda</a></li>
+			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
 			<li class="active">Daftar Inventaris Jalan, Irigasi Dan Jaringan</li>
 		</ol>
 	</section>
@@ -15,10 +15,16 @@
 				<div class="col-md-9">
 					<div class="box box-info">
 						<div class="box-header with-border">
-							<a href="#" class="btn btn-social btn-flat bg-purple btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Inventaris">
+							<a href="#"
+								class="btn btn-social btn-flat bg-purple btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
+								title="Cetak Data" data-remote="false" data-toggle="modal" data-target="#cetakBox"
+								data-title="Cetak Inventaris">
 								<i class="fa fa-print"></i>Cetak
 							</a>
-							<a href="#" class="btn btn-social btn-flat bg-navy btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh Inventaris">
+							<a href="#"
+								class="btn btn-social btn-flat bg-navy btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
+								title="Unduh Data" data-remote="false" data-toggle="modal" data-target="#unduhBox"
+								data-title="Unduh Inventaris">
 								<i class="fa fa-download"></i>Unduh
 							</a>
 						</div>
@@ -30,9 +36,9 @@
 											<div class="dataTables_wrapper form-inline dt-bootstrap">
 												<div class="form-group">
 													<select class="form-control input-sm " name="tahun"
-														onchange="formAction('mainform','<?= site_url($this->controller . '/filter/tahun')?>')">
+														onchange="formAction('mainform','<?= site_url($this->controller.'/filter/tahun')?>')">
 														<option value="">Tahun</option>
-														<?php for ($i = date('Y'); $i >= 1900; $i--): ?>
+														<?php for ($i=date("Y"); $i>=1900; $i--): ?>
 														<option value="<?= $i ?>" <?php selected($tahun, $i) ?>><?= $i ?></option>
 														<?php endfor; ?>
 													</select>
@@ -132,16 +138,18 @@
 		</form>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $this->load->view('inventaris/inventaris_permen47_cetak') ?>
+<?php $this->load->view('inventaris/inventaris_permen47_unduh') ?>
+<?php $this->load->view('global/confirm_delete');?>
 
 <script>
 $("#form_cetak").click(function(event) {
-	var link = '<?= site_url('laporan_inventaris/permendagri_47_cetak'); ?>' + '/' + $('#kades').val() + '/' + $(
+	var link = '<?= site_url("laporan_inventaris/permendagri_47_cetak"); ?>' + '/' + $('#kades').val() + '/' + $(
 		'#sekdes').val();
 	window.open(link, '_blank');
 });
 $("#form_download").click(function(event) {
-	var link = '<?= site_url('laporan_inventaris/permendagri_47_excel'); ?>' + '/' + $('#kades_unduh').val() + '/' +
+	var link = '<?= site_url("laporan_inventaris/permendagri_47_excel"); ?>' + '/' + $('#kades_unduh').val() + '/' +
 		$('#sekdes_unduh').val();
 	window.open(link, '_blank');
 });

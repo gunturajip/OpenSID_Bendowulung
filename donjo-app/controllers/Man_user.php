@@ -1,8 +1,18 @@
 <?php
 
+defined('BASEPATH') OR exit('No direct script access allowed');
+
 /*
+ *  File ini:
  *
- * File ini bagian dari:
+ * Controller untuk modul Pengaturan > Pengguna
+ *
+ * donjo-app/controllers/Man_user.php
+ *
+ */
+
+/*
+ *  File ini bagian dari:
  *
  * OpenSID
  *
@@ -11,7 +21,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,276 +36,179 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+class Man_user extends Admin_Controller {
 
-use App\Models\Pamong;
-use App\Models\User;
-use App\Models\UserGrup;
+	public function __construct()
+	{
+		parent::__construct();
+		$this->load->model('referensi_model');
+		$this->modul_ini = 11;
+		$this->sub_modul_ini = 44;
+	}
 
-class Man_user extends Admin_Controller
-{
-    private int $tab_ini = 10;
+	public function clear()
+	{
+		unset($_SESSION['cari']);
+		unset($_SESSION['filter']);
+		redirect('man_user');
+	}
 
-    public function __construct()
-    {
-        parent::__construct();
+	public function index($p = 1, $o = 0)
+	{
+		$this->set_minsidebar(1);
+		$this->tab_ini = 10;
+		$data['p'] = $p;
+		$data['o'] = $o;
 
-        $this->load->library('form_validation');
-        $this->form_validation->set_error_delimiters('', '');
-        $this->modul_ini     = 'pengaturan';
-        $this->sub_modul_ini = 'pengguna';
-    }
+		if (isset($_SESSION['cari']))
+			$data['cari'] = $_SESSION['cari'];
+		else $data['cari'] = '';
 
-    public function index()
-    {
-        $data['tab_ini'] = $this->tab_ini;
+		if (isset($_SESSION['filter']))
+			$data['filter'] = $_SESSION['filter'];
+		else $data['filter'] = '';
 
-        $data['status'] = [
-            ['id' => '1', 'nama' => 'Aktif'],
-            ['id' => '0', 'nama' => 'Tidak Aktif'],
-        ];
-        $data['user_group'] = UserGrup::pluck('nama', 'id');
+		if (isset($_POST['per_page']))
+			$_SESSION['per_page'] = $_POST['per_page'];
+		$data['per_page'] = $_SESSION['per_page'];
 
-        if ($this->input->is_ajax_request()) {
-            $input = $this->input;
+		$data['paging'] = $this->user_model->paging($p, $o);
+		$data['main'] = $this->user_model->list_data($o, $data['paging']->offset, $data['paging']->per_page);
+		$data['keyword'] = $this->user_model->autocomplete();
 
-            return datatables(
-                User::with('pamong', 'userGrup')
-                    ->whereHas('userGrup', function ($query): void {
-                        if ($group = $this->input->get('group')) {
-                            $query->where('id', $group);
-                        }
-                    })
-            )->filter(static function ($query) use ($input): void {
-                $query->status($input->get('status'));
-            })
-                ->addIndexColumn()
-                ->addColumn('ceklist', static function ($row) {
-                    if ($row->id != super_admin()) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
-                    }
-                })
-                ->addColumn('aksi', static function ($row): string {
-                    $aksi = '';
+		$data['user_group'] = $this->referensi_model->list_data("user_grup");
 
-                    if (can('u')) {
-                        $aksi .= '<a href="' . site_url("man_user/form/{$row->id}") . '" class="btn bg-orange btn-sm" title="Ubah"><i class="fa fa-edit"></i></a> ';
-                    }
-                    if ($row->id != super_admin()) {
-                        if (can('u')) {
-                            if ($row->active == '0') {
-                                $aksi .= '<a href="' . site_url("man_user/user_unlock/{$row->id}") . '" class="btn bg-navy btn-sm" title="Aktifkan Pengguna"><i class="fa fa-lock"></i></a> ';
-                            } elseif ($row->active == '1') {
-                                $aksi .= '<a href="' . site_url("man_user/user_lock/{$row->id}") . '" class="btn bg-navy btn-sm" title="Non Aktifkan Pengguna"><i class="fa fa-unlock"></i></a> ';
-                            }
-                        }
-                        if (can('h')) {
-                            $aksi .= '<a href="#" data-href="' . site_url("man_user/delete/{$row->id}") . '" class="btn bg-maroon btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a> ';
-                        }
-                    }
+		$this->render('man_user/manajemen_user_table', $data);
+	}
 
-                    return $aksi;
-                })
-                ->addColumn('pamong_status', static fn ($row): string => $row->pamong->pamong_status == 1
-                    ? '<span class="label label-success">Staf</span>'
-                    : '<span class="label label-info">Bukan Staf</span>')
-                ->editColumn('last_login', static fn ($row) => tgl_indo2($row->last_login))
-                ->editColumn('email_verified_at', static fn ($row) => tgl_indo2($row->email_verified_at))
-                ->rawColumns(['ceklist', 'aksi', 'pamong_status'])
-                ->make();
-        }
+	public function form($p = 1, $o = 0, $id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$data['p'] = $p;
+		$data['o'] = $o;
 
-        return view('admin.pengaturan.pengguna.index', $data);
-    }
+		if ($id)
+		{
+			$data['user'] = $this->user_model->get_user($id);
+			$data['form_action'] = site_url("man_user/update/$p/$o/$id");
+		}
+		else
+		{
+			$data['user'] = NULL;
+			$data['form_action'] = site_url("man_user/insert");
+		}
 
-    public function form($id = '')
-    {
-        $this->redirect_hak_akses('u');
+		$data['user_group'] = $this->referensi_model->list_data("user_grup");
 
-        if ($id) {
-            $data['user']        = User::findOrFail($id);
-            $data['form_action'] = site_url("man_user/update/{$id}");
-            $data['action']      = 'Ubah';
-        } else {
-            $data['user']        = null;
-            $data['form_action'] = site_url('man_user/insert');
-            $data['action']      = 'Tambah';
-        }
+		$this->render('man_user/manajemen_user_form', $data);
+	}
 
-        $data['user_group']          = UserGrup::get(['id', 'nama']);
-        $data['akses']               = (new UserGrup())->getGrupSistem();
-        $data['pamong']              = Pamong::selectData()->aktif()->bukanPengguna($id)->get();
-        $data['notifikasi_telegram'] = setting('telegram_notifikasi');
+	public function search()
+	{
+		$cari = $this->input->post('cari');
+		if ($cari != '')
+			$_SESSION['cari'] = $cari;
+		else unset($_SESSION['cari']);
+		redirect('man_user');
+	}
 
-        return view('admin.pengaturan.pengguna.form', $data);
-    }
+	public function filter()
+	{
+		$filter = $this->input->post('filter');
+		if ($filter != 0)
+			$_SESSION['filter'] = $filter;
+		else unset($_SESSION['filter']);
+		redirect('man_user');
+	}
 
-    public function insert(): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->set_form_validation();
-        $this->form_validation->set_rules('username', 'Username', 'required|is_unique[user.username]');
-        $this->form_validation->set_rules('email', 'Email', 'is_unique[user.email]');
-        $this->form_validation->set_rules([
-            [
-                'field'  => 'pamong_id',
-                'label'  => 'Pamong',
-                'rules'  => 'is_unique[user.pamong_id]',
-                'errors' => [
-                    'is_unique' => 'pengguna tersebut sudah ada',
-                ],
-            ],
-        ]);
+	public function insert()
+	{
+		$this->redirect_hak_akses('u');
+		$this->set_form_validation();
 
-        if ($this->form_validation->run() !== true) {
-            redirect_with('error', trim(validation_errors()), 'man_user/form');
-        } else {
-            $data = $this->validate($this->input->post());
+		if ($this->form_validation->run() !== true)
+		{
+			$this->session->success = -1;
+			$this->session->error_msg = trim(validation_errors());
+			redirect("man_user/form/$p/$o");
+		}
+		else
+		{
+			$this->user_model->insert();
+			redirect('man_user');
+		}
+	}
 
-            (new User($data))->save();
+	private function set_form_validation()
+	{
+		$this->load->helper('form');
+		$this->load->library('form_validation');
+		$this->form_validation->set_error_delimiters('', '');
+		$this->form_validation->set_rules('password', 'Kata Sandi Baru', 'required|callback_syarat_sandi');
+		$this->form_validation->set_message('syarat_sandi','Harus 6 sampai 20 karakter dan sekurangnya berisi satu angka dan satu huruf besar dan satu huruf kecil');
+	}
 
-            redirect_with('success', 'Berhasil Tambah Data');
-        }
-    }
+	// Kata sandi harus 6 sampai 20 karakter dan sekurangnya berisi satu angka dan satu huruf besar dan satu huruf kecil
+	public function syarat_sandi($str)
+	{
+		// radiisi berarti tidak sandi tidak diubah
+		if (preg_match('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/', $str) or $str == 'radiisi')
+			return TRUE;
+		else
+			return FALSE;
+	}
 
-    private function set_form_validation(): void
-    {
-        $this->form_validation->set_rules('password', 'Kata Sandi Baru', 'required|callback_syarat_sandi');
-        $this->form_validation->set_message('syarat_sandi', 'Harus 6 sampai 20 karakter dan sekurangnya berisi satu angka dan satu huruf besar dan satu huruf kecil');
-    }
+	public function update($p = 1, $o = 0, $id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->set_form_validation();
 
-    // Kata sandi harus 6 sampai 20 karakter dan sekurangnya berisi satu angka dan satu huruf besar dan satu huruf kecil
-    public function syarat_sandi($str): bool
-    {
-        return (bool) (preg_match('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/', $str));
-    }
+		if ($this->form_validation->run() !== true)
+		{
+			$this->session->success = -1;
+			$this->session->error_msg = trim(validation_errors());
+			redirect("man_user/form/$p/$o/$id");
+		}
+		else
+		{
+			$this->user_model->update($id);
+			redirect("man_user/index/$p/$o");
+		}
+	}
 
-    public function update($id = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        if ($this->input->post('password') != '') {
-            $this->set_form_validation();
-        }
-        $this->form_validation->set_rules('username', 'Username', "required|is_unique[user.username,id,{$id}]");
-        $this->form_validation->set_rules('email', 'Email', "is_unique[user.email,id,{$id}]");
-        $this->form_validation->set_rules([
-            [
-                'field'  => 'pamong_id',
-                'label'  => 'Pamong',
-                'rules'  => "is_unique[user.pamong_id,id,{$id}]",
-                'errors' => [
-                    'is_unique' => 'pengguna tersebut sudah ada',
-                ],
-            ],
-        ]);
+	public function delete($p = 1, $o = 0, $id = '')
+	{
+		$this->redirect_hak_akses('h');
+		$this->user_model->delete($id);
+		redirect("man_user/index/$p/$o");
+	}
 
-        if ($this->form_validation->run() !== true) {
-            redirect_with('error', trim(validation_errors()), "man_user/form/{$id}");
-        } else {
-            $data = $this->validate($this->input->post(), $id);
+	public function delete_all($p = 1, $o = 0)
+	{
+		$this->redirect_hak_akses('h');
+		$this->user_model->delete_all();
+		redirect("man_user/index/$p/$o");
+	}
 
-            // Untuk demo jangan ubah username atau password
-            if ($id == UserGrup::where('slug', UserGrup::ADMINISTRATOR)->first()->id && (config_item('demo_mode') || ENVIRONMENT === 'development')) {
-                unset($data['username'], $data['password']);
-            }
+	public function user_lock($id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->user_model->user_lock($id, 0);
+		redirect("man_user/index/$p/$o");
+	}
 
-            User::findOrFail($id)->update($data);
-
-            // perbaharui session login
-            if ((string) $id === (string) $this->session->isAdmin->id) {
-                $this->session->isAdmin = User::find($id);
-            }
-
-            $this->cache->file->delete("{$id}_cache_modul");
-
-            redirect_with('success', 'Berhasil Ubah Data');
-        }
-    }
-
-    public function delete($id = ''): void
-    {
-        $this->redirect_hak_akses('h');
-
-        $this->delete_user($id);
-
-        redirect_with('success', 'Berhasil Hapus Data');
-    }
-
-    public function delete_all(): void
-    {
-        $this->redirect_hak_akses('h');
-
-        foreach ($this->request['id_cb'] as $id) {
-            $this->delete_user($id);
-        }
-
-        redirect_with('success', 'Berhasil Hapus Data');
-    }
-
-    public function user_lock($id = ''): void
-    {
-        $this->redirect_hak_akses('u');
-
-        User::findOrFail($id)->update(['active' => 0]);
-
-        redirect_with('success', 'Berhasil Ubah Data');
-    }
-
-    public function user_unlock($id = ''): void
-    {
-        $this->redirect_hak_akses('u');
-
-        User::findOrFail($id)->update(['active' => 1]);
-
-        redirect_with('success', 'Berhasil Ubah Data');
-    }
-
-    protected function delete_user($id = '')
-    {
-        $user = User::findOrFail($id);
-
-        if ($user->foto != 'kuser.png') {
-            // Ambil nama foto
-            $foto = basename(AmbilFoto($user->foto));
-            unlink(LOKASI_USER_PICT . $foto);
-        }
-
-        $user->delete();
-    }
-
-    protected function validate($request = [], $id = ''): array
-    {
-        $data = [
-            'active'         => (int) ($request['aktif'] ?? 0),
-            'username'       => isset($request['username']) ? alfanumerik($request['username']) : null,
-            'nama'           => isset($request['nama']) ? strip_tags(nama($request['nama'])) : null,
-            'phone'          => isset($request['phone']) ? htmlentities($request['phone']) : null,
-            'email'          => empty($request['email']) ? null : htmlentities($request['email']),
-            'id_grup'        => $request['id_grup'] ?? null,
-            'pamong_id'      => empty($request['pamong_id']) ? null : $request['pamong_id'],
-            'foto'           => isset($request['foto']) ? $this->user_model->urusFoto($id) : null,
-            'notif_telegram' => (int) ($request['notif_telegram'] ?? 0),
-            'id_telegram'    => (int) ($request['id_telegram'] ?? 0),
-            'config_id'      => identitas('id'),
-        ];
-
-        if (! empty($request['password'])) {
-            $data['password'] = generatePasswordHash($request['password']);
-        }
-
-        if (empty($id)) {
-            $data['session'] = md5(now());
-        }
-
-        return $data;
-    }
+	public function user_unlock($id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->user_model->user_lock($id, 1);
+		redirect("man_user/index/$p/$o");
+	}
 }

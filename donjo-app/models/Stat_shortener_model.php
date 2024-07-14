@@ -1,67 +1,27 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
+class Stat_shortener_model extends CI_Model {
 
-defined('BASEPATH') || exit('No direct script access allowed');
+  function add_log( $url_id )
+  {
+    $data = array(
+      'url_id'    => (int) $url_id,
+      'created'   => date('Y-m-d H:i:s'),
+    );
+    $this->db->insert('statistics', $data);
+    return $this->db->insert_id();
+  }
 
-class Stat_shortener_model extends MY_Model
-{
-    public function add_log($url_id)
-    {
-        $data = [
-            'config_id' => identitas('id'),
-            'url_id'    => (int) $url_id,
-            'created'   => date('Y-m-d H:i:s'),
-        ];
-        $this->db->insert('statistics', $data);
+  public function get_logs( $url_id )
+  {
+    $this->db->select( array('*', 'COUNT(id) AS sum') );
+    $this->db->from('statistics');
+    $this->db->where('url_id', (int) $url_id);
+    $this->db->group_by('DATE_FORMAT(created, "%m-%y-%d")');
+    $this->db->order_by('YEAR(created) ASC, MONTH(created) ASC, DAY(created) ASC');
+    $result = $this->db->get()->result_object();
 
-        return $this->db->insert_id();
-    }
-
-    public function get_logs($url_id)
-    {
-        $result = $this->config_id()
-            ->select(['*', 'COUNT(id) AS sum'])
-            ->from('statistics')
-            ->where('url_id', (int) $url_id)
-            ->group_by('DATE_FORMAT(created, "%m-%y-%d")')
-            ->order_by('YEAR(created) ASC, MONTH(created) ASC, DAY(created) ASC')
-            ->get()
-            ->result_object();
-
-        return (count($result) > 0) ? $result : false;
-    }
+    return (count($result) > 0) ? $result : FALSE;
+  }
 }

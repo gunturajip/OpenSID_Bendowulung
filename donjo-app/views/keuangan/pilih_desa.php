@@ -1,13 +1,13 @@
-<script type="text/javascript" src="<?= asset('js/jquery.validate.min.js') ?>"></script>
-<script type="text/javascript" src="<?= asset('js/validasi.js') ?>"></script>
-<script type="text/javascript" src="<?= asset('js/script.js') ?>"></script>
-<script type="text/javascript" src="<?= asset('js/localization/messages_id.js') ?>"></script>
+<script type="text/javascript" src="<?= base_url()?>assets/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="<?= base_url()?>assets/js/validasi.js"></script>
+<script type="text/javascript" src="<?= base_url()?>assets/js/script.js"></script>
+<script type="text/javascript" src="<?= base_url()?>assets/js/localization/messages_id.js"></script>
 <style type="text/css">
 	.horizontal {
 		padding-left: 0px; width: auto; padding-right: 30px;
 	}
 </style>
-<form action="<?= site_url('keuangan/bersihkan_desa/' . $id_master)?>" method="post" id="validasi">
+<form action="<?= site_url('keuangan/bersihkan_desa/'.$id_master)?>" method="post" id="validasi">
 	<div class='modal-body'>
 		<div class="row">
 			<div class="col-sm-12">
@@ -23,8 +23,8 @@
 							<select class="form-control input-sm required" name="kode_desa">
 								<option value="">Pilih Desa</option>
 								<?php foreach ($desa_ganda as $desa): ?>
-									<option value="<?= $desa['Kd_Desa']?>"><?= strtoupper($desa['Nama_Desa'] . ' - ' . $desa['Kd_Desa'])?></option>
-								<?php endforeach; ?>
+									<option value="<?= $desa['Kd_Desa']?>"><?= strtoupper($desa['Nama_Desa'].' - '.$desa['Kd_Desa'])?></option>
+								<?php endforeach;?>
 							</select>
 						</div>
 					</div>

@@ -1,62 +1,5 @@
 <?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-/*
-|--------------------------------------------------------------------------
-| Trusted Hosts
-|--------------------------------------------------------------------------
-|
-| In case you want to leave the base_url configuration empty for portability,
-| it involves a risk:
-|
-| http://www.skeletonscribe.net/2013/05/practical-http-host-header-attacks.html
-|
-| To avoid security issues, you may want to configure a list of "trusted hosts".
-| (for dev and test environments or multi-domain sites)
-|
-| Elements of this list imply you accept any subdomain it has.
-| For example domain.com also accepts <whatever.>domain.com
-|
-| Array: ['localhost', 'my-development.com', 'my-production.com', 'subdomain.domain.com']
-|
-*/
-$config['trusted_hosts'] = [];
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
 |--------------------------------------------------------------------------
@@ -109,7 +52,7 @@ $config['index_page'] = 'index.php/';
 |
 | WARNING: If you set this to 'PATH_INFO', URIs will always be URL-decoded!
 */
-$config['uri_protocol'] = 'REQUEST_URI';
+$config['uri_protocol']	= 'REQUEST_URI';
 
 /*
 |--------------------------------------------------------------------------
@@ -133,7 +76,7 @@ $config['url_suffix'] = '';
 | than english.
 |
 */
-$config['language'] = 'indonesia';
+$config['language']	= 'indonesia';
 
 /*
 |--------------------------------------------------------------------------
@@ -157,7 +100,7 @@ $config['charset'] = 'UTF-8';
 | setting this variable to TRUE (boolean).  See the user guide for details.
 |
 */
-$config['enable_hooks'] = true;
+$config['enable_hooks'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -193,7 +136,7 @@ $config['subclass_prefix'] = 'MY_';
 | Note: This will NOT disable or override the CodeIgniter-specific
 |	autoloading (application/config/autoload.php)
 */
-$config['composer_autoload'] = 'vendor/autoload.php';
+$config['composer_autoload'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -239,10 +182,10 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
 | use segment based URLs.
 |
 */
-$config['enable_query_strings'] = false;
-$config['controller_trigger']   = 'c';
-$config['function_trigger']     = 'm';
-$config['directory_trigger']    = 'd';
+$config['enable_query_strings'] = FALSE;
+$config['controller_trigger'] = 'c';
+$config['function_trigger'] = 'm';
+$config['directory_trigger'] = 'd';
 
 /*
 |--------------------------------------------------------------------------
@@ -256,7 +199,7 @@ $config['directory_trigger']    = 'd';
 |          for backwards compatibility purposes!
 |
 */
-$config['allow_get_array'] = true;
+$config['allow_get_array'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -271,7 +214,6 @@ $config['allow_get_array'] = true;
 |	2 = Debug Messages
 |	3 = Informational Messages
 |	4 = All Messages
-|	5 = Notice Messages
 |
 | You can also pass an array with threshold levels to show individual error types
 |
@@ -281,7 +223,7 @@ $config['allow_get_array'] = true;
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = [1, 5];
+$config['log_threshold'] = ENVIRONMENT === 'development' ? 1 : 1;
 
 /*
 |--------------------------------------------------------------------------
@@ -292,7 +234,7 @@ $config['log_threshold'] = [1, 5];
 | application/logs/ directory. Use a full server path with trailing slash.
 |
 */
-$config['log_path'] = STORAGEPATH . '/logs/';
+$config['log_path'] = FCPATH . 'logs/';
 
 /*
 |--------------------------------------------------------------------------
@@ -302,7 +244,7 @@ $config['log_path'] = STORAGEPATH . '/logs/';
 | File log pattern.
 |
 */
-$config['clv_log_file_pattern'] = 'log-*.php';
+$config["clv_log_file_pattern"] = "log-*.php";
 
 /*
 |--------------------------------------------------------------------------
@@ -361,7 +303,7 @@ $config['error_views_path'] = '';
 | application/cache/ directory.  Use a full server path with trailing slash.
 |
 */
-$config['cache_path'] = FCPATH . LOKASI_CACHE;
+$config['cache_path'] = 'cache/';
 
 /*
 |--------------------------------------------------------------------------
@@ -379,7 +321,7 @@ $config['cache_path'] = FCPATH . LOKASI_CACHE;
 |	             of query parameters.
 |
 */
-$config['cache_query_string'] = false;
+$config['cache_query_string'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -445,13 +387,13 @@ $config['encryption_key'] = 'lumbungkomunitas';
 | except for 'cookie_prefix' and 'cookie_httponly', which are ignored here.
 |
 */
-$config['sess_driver']             = 'files';
-$config['sess_cookie_name']        = 'ci_session';
-$config['sess_expiration']         = 7200;
-$config['sess_save_path']          = sys_get_temp_dir();
-$config['sess_match_ip']           = false;
-$config['sess_time_to_update']     = 300;
-$config['sess_regenerate_destroy'] = false;
+$config['sess_driver'] = 'files';
+$config['sess_cookie_name'] = 'ci_session';
+$config['sess_expiration'] = 7200;
+$config['sess_save_path'] = sys_get_temp_dir();
+$config['sess_match_ip'] = FALSE;
+$config['sess_time_to_update'] = 300;
+$config['sess_regenerate_destroy'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -468,11 +410,11 @@ $config['sess_regenerate_destroy'] = false;
 |       'cookie_httponly') will also affect sessions.
 |
 */
-$config['cookie_prefix']   = '';
-$config['cookie_domain']   = '';
-$config['cookie_path']     = '/';
-$config['cookie_secure']   = false;
-$config['cookie_httponly'] = false;
+$config['cookie_prefix']	= '';
+$config['cookie_domain']	= '';
+$config['cookie_path']		= '/';
+$config['cookie_secure']	= FALSE;
+$config['cookie_httponly'] 	= FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -486,7 +428,7 @@ $config['cookie_httponly'] = false;
 |          for backwards compatibility purposes!
 |
 */
-$config['standardize_newlines'] = false;
+$config['standardize_newlines'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -500,7 +442,7 @@ $config['standardize_newlines'] = false;
 |          for backwards compatibility purposes!
 |
 */
-$config['global_xss_filtering'] = false;
+$config['global_xss_filtering'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -516,12 +458,12 @@ $config['global_xss_filtering'] = false;
 | 'csrf_regenerate' = Regenerate token on every submission
 | 'csrf_exclude_uris' = Array of URIs which ignore CSRF checks
 */
-$config['csrf_protection']   = true;
-$config['csrf_token_name']   = 'sidcsrf';
-$config['csrf_cookie_name']  = 'sidcsrf';
-$config['csrf_expire']       = 7200;
-$config['csrf_regenerate']   = true;
-$config['csrf_exclude_uris'] = ['api.*+'];
+$config['csrf_protection'] = true;
+$config['csrf_token_name'] = 'sidcsrf';
+$config['csrf_cookie_name'] = 'sidcsrf';
+$config['csrf_expire'] = 7200;
+$config['csrf_regenerate'] = true;
+$config['csrf_exclude_uris'] = array();
 
 /*
 |--------------------------------------------------------------------------
@@ -543,7 +485,7 @@ $config['csrf_exclude_uris'] = ['api.*+'];
 | by the output class.  Do not 'echo' any values with compression enabled.
 |
 */
-$config['compress_output'] = false;
+$config['compress_output'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -570,7 +512,7 @@ $config['time_reference'] = 'local';
 | Note: You need to have eval() enabled for this to work.
 |
 */
-$config['rewrite_short_tags'] = false;
+$config['rewrite_short_tags'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -592,22 +534,6 @@ $config['proxy_ips'] = '';
 
 /*
 |--------------------------------------------------------------------------
-| APLIKASI
-|--------------------------------------------------------------------------
-|
-| - Nama Aplikasi
-| - Nama Lembaga
-| - Facebook OpenDesa
-| - Telegram OpenDesa
-|
-*/
-$config['nama_aplikasi'] = 'OpenSID';
-$config['nama_lembaga']  = 'OpenDesa';
-$config['fb_opendesa']   = 'https://www.facebook.com/groups/komunitasopendesa';
-$config['tg_opendesa']   = 'https://t.me/komunitasopensidstop';
-
-/*
-|--------------------------------------------------------------------------
 | PANTAU / TRACKSID
 |--------------------------------------------------------------------------
 |
@@ -616,7 +542,7 @@ $config['tg_opendesa']   = 'https://t.me/komunitasopensidstop';
 |
 */
 $config['server_pantau'] = 'https://pantau.opensid.my.id';
-$config['token_pantau']  = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6bnVsbCwidGltZXN0YW1wIjoxNjAzNDY2MjM5fQ.HVCNnMLokF2tgHwjQhSIYo6-2GNXB4-Kf28FSIeXnZw';
+$config['token_pantau'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6bnVsbCwidGltZXN0YW1wIjoxNjAzNDY2MjM5fQ.HVCNnMLokF2tgHwjQhSIYo6-2GNXB4-Kf28FSIeXnZw';
 
 /*
 |--------------------------------------------------------------------------
@@ -624,74 +550,6 @@ $config['token_pantau']  = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6bnVsbCw
 |--------------------------------------------------------------------------
 |
 | - Server layanan (Default)
-|
+| 
 */
 $config['server_layanan'] = 'https://layanan.opendesa.id';
-
-/*
-|--------------------------------------------------------------------------
-| URL Rilis
-|--------------------------------------------------------------------------
-|
-*/
-$config['rilis_umum']    = 'https://api.github.com/repos/opensid/opensid/releases/latest';
-$config['rilis_premium'] = 'https://api.github.com/repos/opensid/rilis-premium/releases/latest';
-
-/*
-|--------------------------------------------------------------------------
-| API IDM Kemendesa
-|--------------------------------------------------------------------------
-|
-*/
-$config['api_idm'] = 'https://idm.kemendesa.go.id/open/api/desa/rumusan';
-
-/*
-|--------------------------------------------------------------------------
-| API SDGS Kemendesa
-|--------------------------------------------------------------------------
-|
-*/
-$config['api_sdgs'] = 'https://sid.kemendesa.go.id/sdgs/searching/score-sdgs?location_code=';
-
-/*
-|--------------------------------------------------------------------------
-| API Hari Libur
-|--------------------------------------------------------------------------
-|
-*/
-$config['api_hari_libur'] = 'https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/holidays.json';
-
-/*
-|--------------------------------------------------------------------------
-| API Google Recaptcha
-|--------------------------------------------------------------------------
-|
-*/
-$config['api_google_recaptcha'] = 'https://google.com/recaptcha/api/';
-
-/*
-|--------------------------------------------------------------------------
-| Path View Blade
-|--------------------------------------------------------------------------
-|
-*/
-$config['views_blade'] = [
-    RESOURCESPATH . 'views/',
-];
-
-/*
-|--------------------------------------------------------------------------
-| Path Cache Balde
-|--------------------------------------------------------------------------
-|
-*/
-$config['cache_blade'] = STORAGEPATH . 'framework/views/';
-
-/*
-|--------------------------------------------------------------------------
-| failed login attempts
-|--------------------------------------------------------------------------
-|
-*/
-$config['maximum_login_attempts'] = 3;
-$config['lockout_time']           = 300;                 // The number of seconds to lockout an account due to exceeded attempts

@@ -1,9 +1,8 @@
-<?php defined('BASEPATH') || exit('No direct script access allowed'); ?>
-
 <style type="text/css">
 	table.disdukcapil {
-		font-size: 9pt;
+		font-size: 10pt;
 		width: 100%;
+		/*border-collapse: collapse;*/
 	}
 
 	table.disdukcapil td {
@@ -18,7 +17,7 @@
 	table.disdukcapil td.padat {
 		padding: 0px;
 		margin: 0px;
-		font-size: 9pt;
+		font-size: 9.5pt;
 	}
 
 	table.disdukcapil td.kotak {
@@ -34,11 +33,11 @@
 	}
 
 	table.pengikut {
-		margin-left: 28px;
-		font-size: 9pt;
+		font-size: 10pt;
+		margin-top: 25px;
 		border-collapse: collapse;
 		border: solid 1px black;
-		width: 96%;
+		width: 100%;
 	}
 
 	table.pengikut td,
@@ -56,18 +55,9 @@
 		text-align: center;
 	}
 
-	table.kode_format {
-		font-size: 12pt;
-		padding: 5px 20px;
-		border: solid 1px black;
-	}
-
 	table.ttd {
-		font-size: 8.5pt;
-		margin-top: 5px;
+		margin-top: 20px;
 		width: 100%;
-		border-collapse: collapse;
-		padding: 0px;
 	}
 
 	table.ttd td {
@@ -487,7 +477,7 @@
 		</tr>
 		<tr>
 			<td>Camat <?= $config['nama_kecamatan']; ?></td>
-			<td><?= $penandatangan['atas_nama'] ?></td>
+			<td><?= $this->penandatangan_lampiran($data); ?></td>
 			<td></td>
 		</tr>
 		<tr style="font-size: 20mm; line-height: normal;">
@@ -497,7 +487,7 @@
 		</tr>
 		<tr>
 			<td><?= $config['nama_kepala_camat']; ?></td>
-			<td><?= $penandatangan['nama'] ?></td>
+			<td><?= $input['pamong'] ?></td>
 			<td><?= $individu['nama'] ?></td>
 		</tr>
 		<tr>
@@ -510,4 +500,5 @@
 		<strong>Keterangan:</strong><br>
 		*) Diisi Oleh Petugas
 	</p>
+
 </page>

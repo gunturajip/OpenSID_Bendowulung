@@ -1,41 +1,5 @@
 <?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------
@@ -75,13 +39,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 |  $autoload['packages'] = array(APPPATH.'third_party', '/usr/local/shared');
 |
 */
-$autoload['packages'] = [
-    APPPATH . 'third_party/DevelBar',
-    APPPATH . 'third_party/faker',
-    APPPATH . 'third_party/pelanggan',
-    APPPATH . 'third_party/pendaftaran_kerjasama',
-    APPPATH . 'third_party/security',
-];
+$autoload['packages'] = array(APPPATH . 'third_party/DevelBar');
 
 /*
 | -------------------------------------------------------------------
@@ -100,8 +58,7 @@ $autoload['packages'] = [
 |
 |	$autoload['libraries'] = array('user_agent' => 'ua');
 */
-// $autoload['libraries'] = ['database', 'session'];
-$autoload['libraries'] = ['session', 'user_agent'];
+$autoload['libraries'] = array('database', 'session');
 
 /*
 | -------------------------------------------------------------------
@@ -122,7 +79,7 @@ $autoload['libraries'] = ['session', 'user_agent'];
 |	$autoload['drivers'] = array('cache' => 'cch');
 |
 */
-$autoload['drivers'] = ['session'];
+$autoload['drivers'] = array('session');
 
 /*
 | -------------------------------------------------------------------
@@ -132,7 +89,7 @@ $autoload['drivers'] = ['session'];
 |
 |	$autoload['helper'] = array('url', 'file');
 */
-$autoload['helper'] = ['url', 'language', 'general', 'form', 'donjolib', 'date', 'pict', 'opensid', 'database', 'surat', 'cek'];
+$autoload['helper'] = array('url','donjolib','date','pict','opensid','database','surat');
 
 /*
 | -------------------------------------------------------------------
@@ -146,7 +103,7 @@ $autoload['helper'] = ['url', 'language', 'general', 'form', 'donjolib', 'date',
 | config files.  Otherwise, leave it blank.
 |
 */
-$autoload['config'] = ['sid_ini'];
+$autoload['config'] = array('sid_ini');
 
 /*
 | -------------------------------------------------------------------
@@ -160,7 +117,7 @@ $autoload['config'] = ['sid_ini'];
 | "codeigniter_lang.php" would be referenced as array('codeigniter');
 |
 */
-$autoload['language'] = [];
+$autoload['language'] = array();
 
 /*
 | -------------------------------------------------------------------
@@ -175,8 +132,4 @@ $autoload['language'] = [];
 |
 |	$autoload['model'] = array('first_model' => 'first');
 */
-/*
-| Di sini hanya autoload model untuk mengisi data awal.
-| Untuk model lain yang akan diautoload, tambahkan di donjo-app/core/MY_Controller.php
-*/
-$autoload['model'] = [];
+$autoload['model'] = array('folder_desa_model');

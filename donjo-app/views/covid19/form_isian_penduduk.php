@@ -21,7 +21,7 @@
 				<option value="">-- Pilih Jenis Kelamin --</option>
 				<?php foreach ($jenis_kelamin as $data): ?>
 					<option <?php selected($penduduk['id_sex'], $data['id']); ?> value="<?= $data['id']?>"> <?= strtoupper($data['nama'])?> </option>
-				<?php endforeach; ?>
+				<?php endforeach;?>
 			</select>
 		</div>
 	</div>
@@ -33,7 +33,7 @@
 				<option value="">-- Pilih Agama --</option>
 				<?php foreach ($agama as $data): ?>
 					<option <?php selected($penduduk['agama_id'], $data['id']); ?> value="<?= $data['id']?>"> <?= strtoupper($data['nama'])?> </option>
-				<?php endforeach; ?>
+				<?php endforeach;?>
 			</select>
 		</div>
 	</div>
@@ -64,7 +64,7 @@
 				<option value="">Pilih Golongan Darah</option>
 				<?php foreach ($golongan_darah as $data): ?>
 					<option <?php selected($penduduk['golongan_darah_id'], $data['id']); ?> value="<?= $data['id']?>"> <?= strtoupper($data['nama'])?> </option>
-				<?php endforeach; ?>
+				<?php endforeach;?>
 			</select>
 		</div>
 	</div>
@@ -76,8 +76,8 @@
 				<?php foreach ($status_penduduk as $data): ?>
 					<?php if ($data['id'] != '1'): ?>
 						<option <?php selected($penduduk['id_status'], $data['id']); ?> value="<?= $data['id']?>"> <?= strtoupper($data['nama'])?> </option>
-					<?php endif; ?>
-				<?php endforeach; ?>
+					<?php endif;?>
+				<?php endforeach;?>
 			</select>
 		</div>
 	</div>
@@ -103,7 +103,7 @@
 	<div class="col-sm-4">
 		<div class="form-group">
 			<label>RW</label>
-			<select id="rw" class="form-control input-sm required" name="rw" data-source="<?= site_url('wilayah/list_rw/')?>" data-valueKey="rw" data-displayKey="rw" >
+			<select id="rw" class="form-control input-sm required" name="rw" data-source="<?= site_url()?>wilayah/list_rw/" data-valueKey="rw" data-displayKey="rw" >
 				<option class="placeholder" value="">Pilih RW</option>
 				<?php foreach ($rw as $data): ?>
 					<option <?php selected($penduduk['rw'], $data['rw']) ?> value="<?= $data['rw']?>"> <?= $data['rw']?> </option>
@@ -115,7 +115,7 @@
 		<div id='isi_rt' class="form-group">
 			<label>RT</label>
 			<select id="id_cluster" class="form-control input-sm required" name="id_cluster"
-			data-source="<?= site_url('wilayah/list_rt/')?>" data-valueKey="id" data-displayKey="rt">
+			data-source="<?= site_url()?>wilayah/list_rt/" data-valueKey="id" data-displayKey="rt">
 				<option class="placeholder" value="">Pilih RT </option>
 				<?php foreach ($rt as $data): ?>
 					<option <?php selected($penduduk['id_cluster'], $data['id']) ?> value="<?= $data['id']?>"> <?= $data['rt']?> </option>

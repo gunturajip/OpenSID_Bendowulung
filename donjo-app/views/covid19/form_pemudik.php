@@ -2,7 +2,7 @@
 	<section class="content-header">
 		<h1>Penambahan Pemudik Covid-19</h1>
 		<ol class="breadcrumb">
-			<li><a href="<?= site_url('beranda')?>"><i class="fa fa-home"></i> Beranda</a></li>
+			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
 			<li><a href="<?= site_url('covid19')?>"> Daftar Pemudik Saat Covid-19</a></li>
 			<li class="active">Penambahan Pemudik Covid-19</li>
 		</ol>
@@ -24,11 +24,13 @@
 					<div class="form-group" >
 						<label class="col-sm-3 control-label required"  for="terdata">NIK / Nama</label>
 						<div class="col-sm-4">
-							<select class="form-control select2 required" id="covid_pemudik" name="terdata"  onchange="formAction('main')" style="width: 100%;">
+							<select class="form-control select2 required" id="terdata" name="terdata"  onchange="formAction('main')" style="width: 100%;">
 								<option value="">-- Silakan Masukan NIK / Nama--</option>
-								<?php if ($individu['nik']) : ?>
-									<option value="<?= $individu['id'] ?>" selected><?= 'NIK: ' . $individu['nik'] . ' - ' . $individu['nama'] . ' - ' . $individu['alamat_wilayah'] ?></option>
-								<?php endif; ?>
+								<?php foreach ($list_penduduk as $item):
+									if (strlen($item["id"])>0): ?>
+										<option value="<?= $item['id']?>" <?php selected($individu['id'], $item['id']); ?>>Nama : <?= $item['nama']." - ".$item['info']?></option>
+									<?php endif;
+								endforeach; ?>
 							</select>
 						</div>
 						<div class="col-sm-4">
@@ -52,10 +54,10 @@
 							 </div>
 						</div>
 						<?php if ($individu): ?>
-							<?php include 'donjo-app/views/covid19/konfirmasi_pemudik.php'; ?>
+							<?php include("donjo-app/views/covid19/konfirmasi_pemudik.php"); ?>
 						<?php endif; ?>
 
-						<?php include 'donjo-app/views/covid19/form_isian_pemudik.php'; ?>
+						<?php include("donjo-app/views/covid19/form_isian_pemudik.php"); ?>
 
 					</form>
 				</div>
@@ -79,7 +81,7 @@
 			</div>
 			<div class='modal-body'>
 				<div class="row">
-					<?php include 'donjo-app/views/covid19/form_isian_penduduk.php'; ?>
+					<?php include("donjo-app/views/covid19/form_isian_penduduk.php"); ?>
 				</div>
 			</div>
 			<div class='modal-footer'>

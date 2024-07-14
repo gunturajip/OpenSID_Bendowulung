@@ -1,16 +1,18 @@
 <?php
 
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
+/**
  * File ini:
  *
  * View untuk modul Buku Administrasi Desa > Administrasi Pembangunan > Buku Tanah Desa
  *
  * donjo-app/views/bumindes/pembangunan/tanah_di_desa/tanah_di_desa_cetak.php
+ *
  */
 
-/*
+/**
+ *
  * File ini bagian dari:
  *
  * OpenSID
@@ -35,16 +37,22 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @copyright	  Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	  Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- *
- * @see 	https://github.com/OpenSID/OpenSID
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 ?>
 
 <table>
 	<tbody>
+		<tr>
+			<td class="text-center">
+				<h4>BUKU TANAH DI DESA</h4>
+			</td>
+		</tr>
 		<tr>
 			<td class="text-center">
 				<h4>BUKU TANAH DESA BULAN <?= strtoupper(getBulan($bulan)) ?> TAHUN <?= $tahun ?></h4>
@@ -58,7 +66,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				<table class="border thick">
 					<thead>
 						<tr class="border thick">
-							<th rowspan="3">NOMOR URUT</th>
+							<th rowspan="3">NNOMOR URUT</th>
 							<th rowspan="3">NAMA PERORANGAN / BADAN HUKUM</th>
 							<th rowspan="3">JML (M<sup>2</sup>)</th>
 							<th colspan="8">STATUS HAK TANAH (M<sup>2</sup>)</th>
@@ -127,13 +135,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
 					</thead>
 					<tbody>
 						<?php
-                        $count = 1;
-
-foreach ($main as $data) :
-    ?>
+							$count = 1;
+							foreach ($main as $data):
+						?>
 							<tr>
 								<td class="text-left"><?= $count ?></td>
-								<td><?= strtoupper($data['nama_pemilik_asal'] ?: $data['nama']) ?></td>
+								<td><?= strtoupper($data['nama_pemilik_asal'] ?: $data['nama'])?></td>
 								<td><?= $data['luas'] ?></td>
 								<td class="text-center"><?= $data['hak_milik'] ?: '' ?></td>
 								<td class="text-center"><?= $data['hak_guna_bangunan'] ?: '' ?></td>
@@ -160,9 +167,9 @@ foreach ($main as $data) :
 								<td><?= strtoupper($data['keterangan']) ?></td>
 							</tr>
 						<?php
-        $count++;
-endforeach;
-?>
+							$count++;
+						 	endforeach;
+						?>
 					</tbody>
 				</table>
 			</td>

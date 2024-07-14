@@ -1,8 +1,14 @@
-<?php
-
+<?php  if(!defined('BASEPATH')) exit('No direct script access allowed');
 /*
+ *  File ini:
  *
- * File ini bagian dari:
+ * Controller untuk modul Analisis
+ *
+ * donjo-app/controllers/Analisis_periode.php
+ *
+ */
+/*
+ *  File ini bagian dari:
  *
  * OpenSID
  *
@@ -11,7 +17,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,148 +32,140 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+class Analisis_periode extends Admin_Controller {
 
-class Analisis_periode extends Admin_Controller
-{
-    public function __construct()
-    {
-        parent::__construct();
+	function __construct()
+	{
+		parent::__construct();
+		$this->load->model('analisis_periode_model');
 
-        if (! $this->session->has_userdata('analisis_master')) {
-            $this->session->success   = -1;
-            $this->session->error_msg = 'Pilih master analisis terlebih dahulu';
+		$_SESSION['submenu'] = "Data Periode";
+		$_SESSION['asubmenu'] = "analisis_periode";
+		$this->modul_ini = 5;
+	}
 
-            redirect('analisis_master');
-        }
+	public function clear()
+	{
+		unset($_SESSION['cari']);
+		unset($_SESSION['state']);
+		redirect('analisis_periode');
+	}
 
-        $this->load->model(['analisis_periode_model', 'analisis_master_model']);
-        $this->session->submenu  = 'Data Periode';
-        $this->session->asubmenu = 'analisis_periode';
-        $this->modul_ini         = 'analisis';
-        $this->sub_modul_ini     = 'master-analisis';
-    }
+	public function leave()
+	{
+		$id = $_SESSION['analisis_master'];
+		unset($_SESSION['analisis_master']);
+		redirect("analisis_master/menu/$id");
+	}
 
-    public function clear(): void
-    {
-        $this->session->unset_userdata(['cari', 'state']);
+	public function index($p=1, $o=0)
+	{
+		unset($_SESSION['cari2']);
+		$data['p'] = $p;
+		$data['o'] = $o;
 
-        redirect($this->controller);
-    }
+		if (isset($_SESSION['cari']))
+			$data['cari'] = $_SESSION['cari'];
+		else $data['cari'] = '';
 
-    public function index($p = 1, $o = 0): void
-    {
-        unset($_SESSION['cari2']);
-        $data['p'] = $p;
-        $data['o'] = $o;
+		if (isset($_SESSION['state']))
+			$data['state'] = $_SESSION['state'];
+		else $data['state'] = '';
+		if (isset($_POST['per_page']))
+			$_SESSION['per_page']=$_POST['per_page'];
+		$data['per_page'] = $_SESSION['per_page'];
 
-        $data['cari'] = $_SESSION['cari'] ?? '';
+		$data['paging'] = $this->analisis_periode_model->paging($p,$o);
+		$data['main'] = $this->analisis_periode_model->list_data($o, $data['paging']->offset, $data['paging']->per_page);
+		$data['keyword'] = $this->analisis_periode_model->autocomplete();
+		$data['analisis_master'] = $this->analisis_periode_model->get_analisis_master();
+		$data['list_state'] = $this->analisis_periode_model->list_state();
 
-        $data['state'] = $_SESSION['state'] ?? '';
-        if (isset($_POST['per_page'])) {
-            $_SESSION['per_page'] = $_POST['per_page'];
-        }
-        $data['per_page'] = $_SESSION['per_page'];
+		$this->set_minsidebar(1);
+		$this->render('analisis_periode/table', $data);
+	}
 
-        $data['paging']          = $this->analisis_periode_model->paging($p, $o);
-        $data['main']            = $this->analisis_periode_model->list_data($o, $data['paging']->offset, $data['paging']->per_page);
-        $data['keyword']         = $this->analisis_periode_model->autocomplete();
-        $data['analisis_master'] = $this->analisis_master_model->get_analisis_master($this->session->analisis_master);
-        $data['list_state']      = $this->analisis_periode_model->list_state();
+	public function form($p=1, $o=0, $id='')
+	{
+		$this->redirect_hak_akses('u');
+		$data['p'] = $p;
+		$data['o'] = $o;
 
-        $this->render('analisis_periode/table', $data);
-    }
+		if ($id)
+		{
+			$data['analisis_periode'] = $this->analisis_periode_model->get_analisis_periode($id);
+			$data['form_action'] = site_url("analisis_periode/update/$p/$o/$id");
+		}
+		else
+		{
+			$data['analisis_periode'] = null;
+			$data['form_action'] = site_url("analisis_periode/insert");
+		}
 
-    public function form($p = 1, $o = 0, $id = 0): void
-    {
-        $this->redirect_hak_akses('u');
-        $data['p'] = $p;
-        $data['o'] = $o;
+		$data['analisis_master'] = $this->analisis_periode_model->get_analisis_master();
 
-        if ($id) {
-            $data['analisis_periode'] = $this->analisis_periode_model->get_analisis_periode($id) ?? show_404();
-            $data['form_action']      = site_url("{$this->controller}/update/{$p}/{$o}/{$id}");
-        } else {
-            $data['analisis_periode'] = null;
-            $data['form_action']      = site_url("{$this->controller}/insert");
-        }
+		$this->set_minsidebar(1);
+		$this->render('analisis_periode/form', $data);
+	}
 
-        $data['analisis_master'] = $this->analisis_master_model->get_analisis_master($this->session->analisis_master);
+	public function search()
+	{
+		$cari = $this->input->post('cari');
+		if ($cari != '')
+			$_SESSION['cari'] = $cari;
+		else unset($_SESSION['cari']);
+		redirect('analisis_periode');
+	}
 
-        $this->render('analisis_periode/form', $data);
-    }
+	public function state()
+	{
+		$filter = $this->input->post('state');
+		if ($filter != 0)
+			$_SESSION['state']=$filter;
+		else unset($_SESSION['state']);
+		redirect('analisis_periode');
+	}
 
-    public function search(): void
-    {
-        $cari = $this->input->post('cari');
-        if ($cari != '') {
-            $_SESSION['cari'] = $cari;
-        } else {
-            unset($_SESSION['cari']);
-        }
+	public function insert()
+	{
+		$this->redirect_hak_akses('u');
+		$this->analisis_periode_model->insert();
+		redirect('analisis_periode');
+	}
 
-        redirect($this->controller);
-    }
+	public function update($p=1, $o=0, $id='')
+	{
+		$this->redirect_hak_akses('u');
+		$this->analisis_periode_model->update($id);
+		redirect("analisis_periode/index/$p/$o");
+	}
 
-    public function state(): void
-    {
-        $filter = $this->input->post('state');
-        if ($filter != 0) {
-            $_SESSION['state'] = $filter;
-        } else {
-            unset($_SESSION['state']);
-        }
+	public function delete($p=1, $o=0, $id='')
+	{
+		$this->redirect_hak_akses('h', "analisis_periode/index/$p/$o");
+		$this->analisis_periode_model->delete($id);
+		redirect("analisis_periode/index/$p/$o");
+	}
 
-        redirect($this->controller);
-    }
+	public function delete_all($p=1, $o=0)
+	{
+		$this->redirect_hak_akses('h', "analisis_periode/index/$p/$o");
+		$this->analisis_periode_model->delete_all();
+		redirect("analisis_periode/index/$p/$o");
+	}
 
-    public function insert(): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->analisis_periode_model->insert();
-
-        redirect($this->controller);
-    }
-
-    public function update($p = 1, $o = 0, $id = 0): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->analisis_periode_model->update($id);
-
-        redirect("{$this->controller}/index/{$p}/{$o}");
-    }
-
-    public function delete($p = 1, $o = 0, $id = 0): void
-    {
-        $this->redirect_hak_akses('h');
-        $this->analisis_periode_model->delete($id);
-
-        redirect("{$this->controller}/index/{$p}/{$o}");
-    }
-
-    public function delete_all($p = 1, $o = 0): void
-    {
-        $this->redirect_hak_akses('h');
-        $this->analisis_periode_model->delete_all();
-
-        redirect("{$this->controller}/index/{$p}/{$o}");
-    }
-
-    // TODO:: Digunakan dimana?
-    public function list_state()
-    {
-        $sql   = 'SELECT * FROM analisis_ref_state';
-        $query = $this->db->query($sql);
-
-        return $query->result_array();
-    }
+	public function list_state()
+	{
+		$sql = "SELECT * FROM analisis_ref_state";
+		$query = $this->db->query($sql);
+		return $query->result_array();
+	}
 }

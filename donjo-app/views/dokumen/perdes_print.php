@@ -3,8 +3,12 @@
 	<head>
 		<title>Data Peraturan <?= ucwords($this->setting->sebutan_desa); ?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link href="<?= asset('css/report.css') ?>" rel="stylesheet" type="text/css">
-		<link rel="shortcut icon" href="<?= favico_desa() ?>"/>
+		<link href="<?= base_url()?>assets/css/report.css" rel="stylesheet" type="text/css">
+		<?php if (is_file(LOKASI_LOGO_DESA . "favicon.ico")): ?>
+			<link rel="shortcut icon" href="<?= base_url()?><?= LOKASI_LOGO_DESA?>favicon.ico" />
+		<?php else: ?>
+			<link rel="shortcut icon" href="<?= base_url()?>favicon.ico" />
+		<?php endif; ?>
 		<!-- TODO: Pindahkan ke external css -->
 		<style>
 			.textx {
@@ -26,23 +30,23 @@
 		<div id="container">
 			<div id="body">
 				<div class="header" align="center">
-					<h3>BUKU PERATURAN DI <?= strtoupper($this->setting->sebutan_desa . ' ' . $desa['nama_desa'])?></h3>
+					<h3>A.1 BUKU PERATURAN <?= strtoupper($this->setting->sebutan_desa . ' ' . $desa['nama_desa'])?></h3>
 					<h3><?= strtoupper($this->setting->sebutan_kecamatan . ' ' . $desa['nama_kecamatan'] . ' ' . $this->setting->sebutan_kabupaten . ' ' . $desa['nama_kabupaten'])?></h3>
-					<h3><?= empty($tahun) ? '' : 'TAHUN ' . $tahun?></h3>
+					<h3><?= !empty($tahun) ? 'TAHUN '. $tahun : ''?></h3>
 					<br>
 				</div>
 				<table class="border thick">
 					<thead>
 						<tr class="border thick">
 							<th>NOMOR URUT</th>
-							<th>JENIS PERATURAN DI <?= strtoupper(setting('sebutan_desa')) ?></th>
+							<th>JENIS PERATURAN DI DESA</th>
 							<th>NOMOR DAN TANGGAL DITETAPKAN</th>
 							<th>TENTANG</th>
 							<th>URAIAN SINGKAT</th>
-							<th>TANGGAL KESEPAKATAN PERATURAN <?= strtoupper(setting('sebutan_desa')) ?></th>
+							<th>TANGGAL KESEPAKATAN PERATURAN DESA</th>
 							<th>NOMOR DAN TANGGAL DILAPORKAN</th>
-							<th>NOMOR DAN TANGGAL DIUNDANGKAN DALAM LEMBARAN <?=strtoupper($this->setting->sebutan_desa)?></th>
-							<th>NOMOR DAN TANGGAL DIUNDANGKAN DALAM BERITA <?=strtoupper($this->setting->sebutan_desa)?></th>
+							<th>NOMOR DAN TANGGAL DIUNDANGKAN DALAM LEMBARAN DESA</th>
+							<th>NOMOR DAN TANGGAL DIUNDANGKAN DALAM BERITA DESA</th>
 							<th>KET.</th>
 						</tr>
 						<tr class="border thick">
@@ -63,20 +67,20 @@
 						<tr>
 							<td><?= $data['no']?></td>
 							<td><?= $data['attr']['jenis_peraturan']?></td>
-							<td><?= 'Nomor ' . strip_kosong($data['attr']['no_ditetapkan']) . ', Tanggal ' . tgl_indo_dari_str($data['attr']['tgl_ditetapkan'])?></td>
+							<td><?= 'Nomor '.strip_kosong($data['attr']['no_ditetapkan']).", Tanggal ".tgl_indo_dari_str($data['attr']['tgl_ditetapkan'])?></td>
 							<td><?= $data['nama']?></td>
 							<td><?= $data['attr']['uraian']?></td>
 							<td><?= tgl_indo_dari_str($data['attr']['tgl_kesepakatan'])?></td>
-							<td><?= 'Nomor ' . strip_kosong($data['attr']['no_lapor']) . ', Tanggal ' . tgl_indo_dari_str($data['attr']['tgl_lapor'])?></td>
-							<td><?= 'Nomor ' . strip_kosong($data['attr']['no_lembaran_desa']) . ', Tanggal ' . tgl_indo_dari_str($data['attr']['tgl_lembaran_desa'])?></td>
-							<td><?= 'Nomor ' . strip_kosong($data['attr']['no_berita_desa']) . ', Tanggal ' . tgl_indo_dari_str($data['attr']['tgl_berita_desa'])?></td>
+							<td><?= 'Nomor '.strip_kosong($data['attr']['no_lapor']).", Tanggal ".tgl_indo_dari_str($data['attr']['tgl_lapor'])?></td>
+							<td><?= 'Nomor '.strip_kosong($data['attr']['no_lembaran_desa']).", Tanggal ".tgl_indo_dari_str($data['attr']['tgl_lembaran_desa'])?></td>
+							<td><?= 'Nomor '.strip_kosong($data['attr']['no_berita_desa']).", Tanggal ".tgl_indo_dari_str($data['attr']['tgl_berita_desa'])?></td>
 							<td><?= $data['attr']['keterangan']?></td>
 						</tr>
 						<?php endforeach; ?>
 					</tbody>
 				</table>
 				<br><br>
-				<?php $this->load->view('global/blok_ttd_pamong.php', ['total_col' => 10, 'spasi_kiri' => 3, 'spasi_tengah' => 2]); ?>
+				<?php $this->load->view("global/blok_ttd_pamong.php", ['total_col' => 10, 'spasi_kiri' => 3, 'spasi_tengah' => 2]); ?>
 			</div>
 		</div>
 	</body>

@@ -1,6 +1,14 @@
 <?php
+/**
+ * File ini:
+ *
+ * Model untuk modul Pemetaan (Garis)
+ *
+ * /donjo-app/models/Plan_garis_model.php
+ *
+ */
 
-/*
+/**
  *
  * File ini bagian dari:
  *
@@ -11,7 +19,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,279 +34,282 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
+ * @package OpenSID
+ * @author  Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @copyright Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license http://www.gnu.org/licenses/gpl.html  GPL V3
+ * @link  https://github.com/OpenSID/OpenSID
  */
 
-use App\Models\Garis;
+class Plan_garis_model extends MY_Model {
 
-defined('BASEPATH') || exit('No direct script access allowed');
+	public function __construct()
+	{
+		parent::__construct();
+	}
 
-class Plan_garis_model extends MY_Model
-{
-    protected $table = 'garis';
+	public function autocomplete()
+	{
+		return $this->autocomplete_str('nama', 'garis');
+	}
 
-    public function autocomplete()
-    {
-        return $this->autocomplete_str('nama', $this->table);
-    }
+	private function search_sql()
+	{
+		if (isset($_SESSION['cari']))
+		{
+			$cari = $_SESSION['cari'];
+			$kw = $this->db->escape_like_str($cari);
+			$kw = '%' .$kw. '%';
+			$search_sql = " AND l.nama LIKE '$kw'";
+			return $search_sql;
+		}
+	}
 
-    private function search_sql(): void
-    {
-        if ($cari = $this->session->cari) {
-            $this->db->like('l.nama', $cari);
-        }
-    }
+	private function filter_sql()
+	{
+		if (isset($_SESSION['filter']))
+		{
+			$kf = $_SESSION['filter'];
+			$filter_sql = " AND l.enabled = $kf";
+			return $filter_sql;
+		}
+	}
 
-    private function filter_sql(): void
-    {
-        if ($filter = $this->session->filter) {
-            $this->db->where('l.enabled', $filter);
-        }
-    }
+	private function line_sql()
+	{
+		if ($kf = $this->session->line)
+		{
+			$line_sql = " AND m.id = $kf";
+			return $line_sql;
+		}
+	}
 
-    private function line_sql(): void
-    {
-        if ($line = $this->session->line) {
-            $this->db->where('m.id', $line);
-        }
-    }
+	private function subline_sql()
+	{
+		if ($kf = $this->session->subline)
+		{
+			$subline_sql = " AND p.id = $kf";
+			return $subline_sql;
+		}
+	}
 
-    private function subline_sql(): void
-    {
-        if ($subline = $this->session->subline) {
-            $this->db->where('p.id', $subline);
-        }
-    }
+	public function paging($p=1, $o=0)
+	{
+		$sql = "SELECT COUNT(l.id) AS jml " . $this->list_data_sql();
+		$query = $this->db->query($sql);
+		$row = $query->row_array();
+		$jml_data = $row['jml'];
 
-    public function paging($p = 1, $o = 0)
-    {
-        $this->list_data_sql();
-        $row      = $this->db->select('count(l.id) as jml')->get()->row_array();
-        $jml_data = $row['jml'];
+		$this->load->library('paging');
+		$cfg['page'] = $p;
+		$cfg['per_page'] = $_SESSION['per_page'];
+		$cfg['num_rows'] = $jml_data;
+		$this->paging->init($cfg);
 
-        $this->load->library('paging');
-        $cfg['page']     = $p;
-        $cfg['per_page'] = $this->session->per_page;
-        $cfg['num_rows'] = $jml_data;
-        $this->paging->init($cfg);
+		return $this->paging;
+	}
 
-        return $this->paging;
-    }
+	// Pastikan paging dan pencarian data berdasarkan filter yg sama
+	private function list_data_sql()
+	{
+		$sql = "FROM garis l
+			LEFT JOIN line p ON l.ref_line = p.id
+			LEFT JOIN line m ON p.parrent = m.id
+			WHERE 1 ";
+		$sql .= $this->search_sql();
+		$sql .= $this->filter_sql();
+		$sql .= $this->line_sql();
+		$sql .= $this->subline_sql();
+		return $sql;
+	}
 
-    // Pastikan paging dan pencarian data berdasarkan filter yg sama
-    private function list_data_sql(): void
-    {
-        $this->config_id('l')
-            ->from("{$this->table} l")
-            ->join('line p', 'l.ref_line = p.id', 'left')
-            ->join('line m', 'p.parrent = m.id', 'left');
+	public function list_data($o=0,$offset=0, $limit=1000)
+	{
+		switch ($o)
+		{
+			case 1: $order_sql = ' ORDER BY nama'; break;
+			case 2: $order_sql = ' ORDER BY nama DESC'; break;
+			case 3: $order_sql = ' ORDER BY enabled'; break;
+			case 4: $order_sql = ' ORDER BY enabled DESC'; break;
+			default:$order_sql = ' ORDER BY id';
+		}
 
-        $this->search_sql();
-        $this->filter_sql();
-        $this->line_sql();
-        $this->subline_sql();
-    }
+		$paging_sql = ' LIMIT ' .$offset. ',' .$limit;
 
-    public function list_data($o = 0, $offset = 0, $limit = 1000)
-    {
-        switch ($o) {
-            case 1: $this->db->order_by('nama');
-                break;
+		$select_sql = "SELECT l.*, p.nama AS kategori, m.nama AS jenis, p.simbol AS simbol, p.color AS color ";
+		$sql = $select_sql . $this->list_data_sql();
 
-            case 2: $this->db->order_by('nama', 'desc');
-                break;
+		$sql .= $order_sql;
+		$sql .= $paging_sql;
 
-            case 3: $this->db->order_by('enabled');
-                break;
+		$query = $this->db->query($sql);
+		$data = $query->result_array();
 
-            case 4: $this->db->order_by('enabled', 'desc');
-                break;
+		$j = $offset;
+		for ($i=0; $i<count($data); $i++)
+		{
+			$data[$i]['no'] = $j + 1;
 
-            default:$this->db->order_by('id');
-        }
+			if ($data[$i]['enabled'] == 1)
+				$data[$i]['aktif'] = "Ya";
+			else
+				$data[$i]['aktif'] = "Tidak";
 
-        $this->list_data_sql();
+			$j++;
+		}
+		return $data;
+	}
 
-        $data = $this->db
-            ->select('l.*, p.nama as kategori, m.nama as jenis, p.simbol, p.color, p.tebal, p.jenis as jenis_garis')
-            ->limit($limit, $offset)
-            ->get()
-            ->result_array();
+	private function validasi($post)
+	{
+		$data['nama'] = nomor_surat_keputusan($post['nama']);
+		$data['ref_line'] = $post['ref_line'];
+		$data['desk'] = htmlentities($post['desk']);
+		$data['enabled'] = $post['enabled'];
+		return $data;
+	}
 
-        $j       = $offset;
-        $counter = count($data);
+	public function insert()
+	{
+		$data = $this->validasi($this->input->post());
+		$garis_file = $_FILES['foto']['tmp_name'];
+		$tipe_file = $_FILES['foto']['type'];
+		$nama_file = $_FILES['foto']['name'];
+		$nama_file = str_replace(' ', '-', $nama_file); 	 // normalkan nama file
+		if (!empty($garis_file))
+		{
+			if ($tipe_file == "image/jpg" OR $tipe_file == "image/jpeg")
+			{
+				Uploadgaris($nama_file);
+				$data['foto'] = $nama_file;
+				$outp = $this->db->insert('garis', $data);
+			}
+		}
+		else
+		{
+			unset($data['foto']);
+			$outp = $this->db->insert('garis', $data);
+		}
+		status_sukses($outp); //Tampilkan Pesan
+	}
 
-        for ($i = 0; $i < $counter; $i++) {
-            $data[$i]['no'] = $j + 1;
+	public function update($id=0)
+	{
+		$data = $this->validasi($this->input->post());
+		$garis_file = $_FILES['foto']['tmp_name'];
+		$tipe_file = $_FILES['foto']['type'];
+		$nama_file = $_FILES['foto']['name'];
+		$nama_file = str_replace(' ', '-', $nama_file); 	 // normalkan nama file
+		if (!empty($garis_file))
+		{
+			if ($tipe_file == "image/jpg" OR $tipe_file == "image/jpeg")
+			{
+				Uploadgaris($nama_file);
+				$data['foto'] = $nama_file;
+				$this->db->where('id', $id);
+				$outp = $this->db->update('garis', $data);
+			}
+		}
+		else
+		{
+			unset($data['foto']);
+			$this->db->where('id', $id);
+			$outp = $this->db->update('garis', $data);
+		}
+		status_sukses($outp); //Tampilkan Pesan
+	}
 
-            $data[$i]['aktif'] = $data[$i]['enabled'] == 1 ? 'Ya' : 'Tidak';
+	public function delete($id='', $semua=false)
+	{
+		if (!$semua) $this->session->success = 1;
 
-            $j++;
-        }
+		$outp = $this->db->where('id', $id)->delete('garis');
 
-        return $data;
-    }
+		status_sukses($outp, $gagal_saja=true); //Tampilkan Pesan
+	}
 
-    private function validasi($post)
-    {
-        return [
-            'nama'     => nomor_surat_keputusan($post['nama']),
-            'ref_line' => $post['ref_line'],
-            'desk'     => htmlentities($post['desk']),
-            'enabled'  => bilangan($post['enabled']),
-        ];
-    }
+	public function delete_all()
+	{
+		$this->session->success = 1;
 
-    public function insert(): void
-    {
-        $data              = $this->validasi($this->input->post());
-        $data['config_id'] = identitas('id');
-        $garis_file        = $_FILES['foto']['tmp_name'];
-        $nama_file         = $_FILES['foto']['name'];
-        $nama_file         = time() . '-' . str_replace(' ', '-', $nama_file);      // normalkan nama file
-        if (! empty($garis_file)) {
-            $data['foto'] = UploadPeta($nama_file, LOKASI_FOTO_GARIS);
-        } else {
-            unset($data['foto']);
-        }
+		$id_cb = $_POST['id_cb'];
+		foreach ($id_cb as $id)
+		{
+			$this->delete($id, $semua=true);
+		}
+	}
 
-        $outp = $this->db->insert($this->table, $data);
+	public function list_line()
+	{
+		$sql = "SELECT * FROM line WHERE tipe = 0 ";
 
-        status_sukses($outp); //Tampilkan Pesan
-    }
+		if (isset($_SESSION['subline']))
+		{
+			$kf = $_SESSION['subline'];
+			$sql .= " AND parrent = $kf";
+		}
 
-    public function update($id = 0): void
-    {
-        $data       = $this->validasi($this->input->post());
-        $old_foto   = $this->input->post('old_foto');
-        $garis_file = $_FILES['foto']['tmp_name'];
-        $nama_file  = $_FILES['foto']['name'];
-        $nama_file  = time() . '-' . str_replace(' ', '-', $nama_file);      // normalkan nama file
-        if (! empty($garis_file)) {
-            $data['foto'] = UploadPeta($nama_file, LOKASI_FOTO_GARIS, $old_foto);
-        } else {
-            unset($data['foto']);
-        }
+		$query = $this->db->query($sql);
+		$data = $query->result_array();
+		return $data;
+	}
 
-        $outp = $this->config_id()->where('id', $id)->update($this->table, $data);
+	public function list_subline()
+	{
+		$sql = "SELECT * FROM line WHERE tipe = 2 ";
 
-        status_sukses($outp); //Tampilkan Pesan
-    }
+		if (isset($_SESSION['line']))
+		{
+			$sqlx = "SELECT * FROM line WHERE id = ?";
+			$query = $this->db->query($sqlx, $_SESSION['line']);
+			$temp = $query->row_array();
+			$kf = $temp['parrent'];
+		}
 
-    public function delete($id = '', $semua = false): void
-    {
-        if (! $semua) {
-            $this->session->success = 1;
-        }
+		$query = $this->db->query($sql);
+		$data = $query->result_array();
+		return $data;
+	}
 
-        $garis = Garis::findOrFail($id);
-        $outp  = $garis->delete();
+	public function garis_lock($id='', $val=0)
+	{
+		$sql = "UPDATE garis SET enabled = ? WHERE id = ?";
+		$outp = $this->db->query($sql, array($val, $id));
 
-        if ($outp && ($garis->foto_kecil || $garis->foto_sedang)) {
-            unlink(FCPATH . $garis->foto_kecil);
-            unlink(FCPATH . $garis->foto_sedang);
-        }
+		status_sukses($outp); //Tampilkan Pesan
+	}
 
-        status_sukses($outp, true); //Tampilkan Pesan
-    }
+	public function get_garis($id=0)
+	{
+		$sql = "SELECT * FROM garis WHERE id = ?";
+		$query = $this->db->query($sql, $id);
+		$data = $query->row_array();
+		return $data;
+	}
 
-    public function delete_all(): void
-    {
-        $this->session->success = 1;
+	public function update_position($id=0)
+	{
+		$data = $_POST;
+		$this->db->where('id', $id);
+		$outp = $this->db->update('garis', $data);
 
-        $id_cb = $this->input->post('id_cb');
+		status_sukses($outp); //Tampilkan Pesan
+	}
 
-        foreach ($id_cb as $id) {
-            $this->delete($id, true);
-        }
-    }
+	public function list_garis()
+	{
+		$data = $this->db
+			->select('l.*, p.nama AS kategori, m.nama AS jenis, p.simbol AS simbol, p.color AS color')
+			->from('garis l')
+			->join('line p', 'l.ref_line = p.id', 'left')
+			->join('line m', ' p.parrent = m.id')
+			->where('l.enabled', 1)
+			->where('p.enabled', 1)
+			->where('m.enabled', 1)
+			->get()->result_array();
+		return $data;
+	}
 
-    public function list_line()
-    {
-        if ($subline = $this->session->subline) {
-            $this->db->where('parrent', $subline);
-        }
-
-        return $this->config_id()
-            ->from('line')
-            ->where('tipe', 0)
-            ->get()
-            ->result_array();
-    }
-
-    public function list_subline()
-    {
-        if ($line = $this->session->line) {
-            $this->db->where('id', $line);
-        }
-
-        return $this->config_id()
-            ->from('line')
-            ->where('tipe', 2)
-            ->get()
-            ->result_array();
-    }
-
-    public function garis_lock($id = '', $val = 0): void
-    {
-        $outp = $this->config_id()
-            ->where('id', $id)
-            ->update($this->table, ['enabled' => $val]);
-
-        status_sukses($outp);
-    }
-
-    public function get_garis($id = 0)
-    {
-        return $this->config_id('l')
-            ->select('l.*, p.nama AS kategori, m.nama AS jenis, p.simbol, p.color, p.tebal, p.jenis AS jenis_garis')
-            ->from("{$this->table} l")
-            ->join('line p', 'l.ref_line = p.id', 'left')
-            ->join('line m', ' p.parrent = m.id')
-            ->where('l.id', $id)
-            ->get()
-            ->row_array();
-    }
-
-    public function update_position($id = 0): void
-    {
-        $data = $_POST;
-        $this->db->where('id', $id);
-        $outp = $data['path'] !== '[]' ? $this->config_id()->update($this->table, $data) : '';
-
-        status_sukses($outp, $gagal_saja = false, $msg = 'titik koordinat garis harus diisi'); //Tampilkan Pesan
-    }
-
-    public function list_garis($status = null)
-    {
-        if (null !== $status) {
-            $this->db
-                ->where('l.enabled', $status)
-                ->where('p.enabled', $status)
-                ->where('m.enabled', $status);
-        }
-
-        return $this->config_id('l')
-            ->select('l.*, p.nama AS kategori, m.nama AS jenis, p.simbol AS simbol, p.color AS color, p.tebal AS tebal, p.jenis AS jenis_garis')
-            ->from("{$this->table} l")
-            ->join('line p', 'l.ref_line = p.id', 'left')
-            ->join('line m', ' p.parrent = m.id', 'left')
-            ->where('l.ref_line !=', 0)
-            ->get()
-            ->result_array();
-    }
-
-    public function kosongkan_path($id): void
-    {
-        $this->config_id()
-            ->set('path', null)
-            ->where('id', $id)
-            ->update($this->table);
-    }
 }
+?>

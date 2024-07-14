@@ -1,20 +1,21 @@
 <?php
-    if ($aksi == 'unduh') {
-        $judul = namafile('Laporan Hasil Analisis ' . $asubjek . ' ' . $subjek['nama']);
+	if ($aksi == 'unduh')
+	{
+		$judul = namafile("Laporan Hasil Analisis ".$asubjek." ".$subjek['nama']);
 
-        header('Content-type: application/xls');
-        header('Content-Disposition: attachment; filename=' . $judul . '.xls');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-    }
-    ?>
+		header("Content-type: application/xls");
+		header("Content-Disposition: attachment; filename=".$judul.".xls");
+		header("Pragma: no-cache");
+		header("Expires: 0");
+	}
+?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Laporan Hasil Analisis <?= $asubjek ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link href="<?= asset('css/report.css') ?>" rel="stylesheet" type="text/css">
+	<link href="<?= base_url()?>assets/css/report.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 	<div id="container">
@@ -25,7 +26,7 @@
 					<tr>
 						<td colspan='6'>
 							<?php if ($aksi != 'unduh'): ?>
-								<img class="logo" src="<?= gambar_desa($config['logo']); ?>" alt="logo-desa">
+								<img class="logo" src="<?= gambar_desa($config['logo']);?>" alt="logo-desa">
 							<?php endif; ?>
 							<h1 class="judul">
 								PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten'] . ' <br>' . $this->setting->sebutan_kecamatan . ' ' . $config['nama_kecamatan'] . ' <br>' . $this->setting->sebutan_desa . ' ' . $config['nama_desa']); ?>
@@ -62,9 +63,7 @@
 				</thead>
 				<tbody>
 
-					<?php $i = 1;
-
-    foreach ($list_anggota as $ang): ?>
+					<?php $i=1; foreach ($list_anggota AS $ang): ?>
 					<tr>
 						<td  align="center" width="2"><?= $i?></td>
 						<td class="textx"><?= $ang['nik']?></td>
@@ -90,8 +89,8 @@
 				</thead>
 				<tbody>
 
-					<?php foreach ($list_jawab as $data): ?>
-						<?php $bg = $data['cek'] >= 1 ? "class='bg'" : ''; ?>
+					<?php foreach ($list_jawab AS $data): ?>
+						<?php if ($data['cek'] >= 1):$bg = "class='bg'";else:$bg ="";endif; ?>
 						<tr>
 							<td><?= $data['no']?></td>
 							<td><?= $data['pertanyaan']?></td>
@@ -123,7 +122,7 @@
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
 				<td width="20%" nowrap>
-					<?= ucwords($this->setting->sebutan_desa) . ' ' . $config['nama_desa']?>, <?= tgl_indo(date('Y m d'))?>
+					<?= ucwords($this->setting->sebutan_desa) . ' ' . $config['nama_desa']?>, <?= tgl_indo(date("Y m d"))?>
 					<br><?= $pamong_ttd['jabatan'] . ' ' . $config['nama_desa']?>
 					<br><br><br><br>
 					<br><u>( <?= $pamong_ttd['pamong_nama']?> )</u>

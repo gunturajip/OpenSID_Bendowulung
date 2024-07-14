@@ -1,16 +1,63 @@
+<?php
+
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+/*
+ * File ini:
+ *
+ * View detail untuk Modul Lapak Admin > Produk
+ *
+ *
+ * donjo-app/views/lapak_admin/produk/detail.php
+ *
+ */
+
+/**
+ *
+ * File ini bagian dari:
+ *
+ * OpenSID
+ *
+ * Sistem informasi desa sumber terbuka untuk memajukan desa
+ *
+ * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
+ *
+ * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ *
+ * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
+ * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
+ * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
+ * asal tunduk pada syarat berikut:
+ *
+ * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
+ * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
+ * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
+ *
+ * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
+ * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
+ * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
+ *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
+ */
+?>
+
 <div class="modal-body">
 	<?php if ($main->foto): ?>
 		<div class="row">
 			<div class="col-md-12">
 				<div id="foto-produk" class="carousel slide" data-ride="carousel">
 					<div class="carousel-inner">
-						<?php $foto = json_decode($main->foto, null); ?>
+						<?php $foto = json_decode($main->foto); ?>
 						<?php for ($i = 0; $i < $this->setting->banyak_foto_tiap_produk; $i++): ?>
 							<?php if ($foto[$i]): ?>
 								<div class="item <?= jecho($i, 0, 'active'); ?>">
-									<div class="image-container">
-										<img src="<?= is_file(LOKASI_PRODUK . $foto[$i]) ? to_base64(LOKASI_PRODUK . $foto[$i]) : to_base64('assets/images/404-image-not-found.jpg') ?>" alt="Foto <?= ($i + 1); ?>">
-									</div>
+									<img src="<?= base_url(LOKASI_PRODUK . $foto[$i]); ?>" alt="Foto <?= ($i+1); ?>">
 									<div class="carousel-caption">
 										Foto <?= ($i == 0) ? 'Utama' : 'Tambahan'; ?>
 									</div>
@@ -31,11 +78,11 @@
 	<?php endif; ?>
 	<div class="form-group">
 		<label class="control-label" for="pelapak">Nama Pelapak</label>
-		<input name="pelapak" class="form-control input-sm" type="text" value="<?= $main->pelapak; ?>" disabled/>
+		<input name="pelapak" class="form-control input-sm" type="text" value="<?= $main->nik . ' - ' . $main->pelapak; ?>" disabled/>
 	</div>
 	<div class="form-group">
 		<label class="control-label" for="nama">Nama Produk</label>
-		<input name="nama" class="form-control input-sm" type="text" value="<?= e($main->nama); ?>" disabled/>
+		<input name="nama" class="form-control input-sm" type="text" value="<?= $main->nama; ?>" disabled/>
 	</div>
 	<div class="row">
 		<div class="col-md-6">
@@ -80,10 +127,10 @@
 	</div>
 	<div class="form-group">
 		<label class="control-label" for="kode_desa">Deskripsi Produk</label>
-		<textarea name="deskripsi" class="form-control input-sm" rows="5" disabled><?= e($main->deskripsi); ?></textarea>
+		<textarea name="deskripsi" class="form-control input-sm" rows="5" disabled><?= $main->deskripsi; ?></textarea>
 	</div>
 </div>
 <div class="modal-footer">
 	<button type="reset" class="btn btn-social btn-flat btn-danger btn-sm pull-left" data-dismiss="modal"><i class="fa fa-sign-out"></i> Tutup</button>
-	<a href="<?= site_url("lapak_admin/produk_form/{$main->id}"); ?>" class="btn btn-social btn-flat bg-orange btn-sm"><i class="fa fa-edit"></i> Ubah</a>
+	<a href="<?= site_url("lapak_admin/produk_form/$main->id"); ?>" class="btn btn-social btn-flat bg-orange btn-sm"><i class="fa fa-edit"></i> Ubah</a>
 </div>

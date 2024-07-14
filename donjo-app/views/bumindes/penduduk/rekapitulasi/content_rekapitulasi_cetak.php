@@ -1,16 +1,18 @@
 <?php
 
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
+/**
  * File ini:
  *
  * View untuk modul Buku Administrasi Desa > Buku Rekapitulasi Jumlah Penduduk
  *
  * donjo-app/views/bumindes/penduduk/rekapitulasi/content_rekapitulasi_cetak.php,
+ *
  */
 
-/*
+/**
+ *
  * File ini bagian dari:
  *
  * OpenSID
@@ -35,11 +37,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @copyright	  Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	  Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- *
- * @see 	https://github.com/OpenSID/OpenSID
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 ?>
 
@@ -47,14 +50,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	<tbody>
 		<tr>
 			<td>
-				<?php if ($aksi == 'cetak'): ?>
+				<?php if ($aksi != 'unduh'): ?>
 					<img class="logo" src="<?= gambar_desa($config['logo']); ?>" alt="logo-desa">
-				<?php elseif ($aksi == 'pdf'): ?>
-					<div style="text-align: center;">
-						<img class="logo" src="<?= gambar_desa($config['logo'], false, $file = true); ?>" alt="logo-desa">
-					</div>
 				<?php endif; ?>
-				<h1 class="judul">
+				<h1 class="judul"> 
 					PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten'] . ' <br>' . $this->setting->sebutan_kecamatan . ' ' . $config['nama_kecamatan'] . ' <br>' . $this->setting->sebutan_desa . ' ' . $config['nama_desa']); ?>
 				</h1>
 			</td>
@@ -86,7 +85,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<th colspan="8">TAMBAHAN BULAN INI</th>
 							<th colspan="8">PENGURANGAN BULAN INI</th>
 							<th rowspan="2" colspan="7">JML PENDUDUK AKHIR BULAN</th>
-							<th rowspan="4">KET</th>
+							<th rowspan="4">KET</th>								
 						</tr>
 						<tr class="border thick">
 							<th colspan="2">WNA</th>
@@ -177,155 +176,48 @@ defined('BASEPATH') || exit('No direct script access allowed');
 						</tr>
 					</thead>
 					<tbody>
-						<?php if ($main):
-						    if ($tampil_jumlah) {
-						        $totals = [
-						            'WNA_L_AWAL'          => 0,
-						            'WNA_P_AWAL'          => 0,
-						            'WNI_L_AWAL'          => 0,
-						            'WNI_P_AWAL'          => 0,
-						            'KK_JLH'              => 0,
-						            'KK_ANG_KEL'          => 0,
-						            'WNA_L_TAMBAH_LAHIR'  => 0,
-						            'WNA_P_TAMBAH_LAHIR'  => 0,
-						            'WNI_L_TAMBAH_LAHIR'  => 0,
-						            'WNI_P_TAMBAH_LAHIR'  => 0,
-						            'WNA_L_TAMBAH_MASUK'  => 0,
-						            'WNA_P_TAMBAH_MASUK'  => 0,
-						            'WNI_L_TAMBAH_MASUK'  => 0,
-						            'WNI_P_TAMBAH_MASUK'  => 0,
-						            'WNA_L_KURANG_MATI'   => 0,
-						            'WNA_P_KURANG_MATI'   => 0,
-						            'WNI_L_KURANG_MATI'   => 0,
-						            'WNI_P_KURANG_MATI'   => 0,
-						            'WNA_L_KURANG_KELUAR' => 0,
-						            'WNA_P_KURANG_KELUAR' => 0,
-						            'WNI_L_KURANG_KELUAR' => 0,
-						            'WNI_P_KURANG_KELUAR' => 0,
-						            'WNA_L_AKHIR'         => 0,
-						            'WNA_P_AKHIR'         => 0,
-						            'WNI_L_AKHIR'         => 0,
-						            'WNI_P_AKHIR'         => 0,
-						            'KK_AKHIR_JML'        => 0,
-						            'KK_AKHIR_ANG_KEL'    => 0,
-						        ];
-						    }
-
-						    foreach ($main as $key => $data):
-						        if ($tampil_jumlah) {
-						            $data['JLH_JIWA_1'] = $data['KK_JLH'] + $data['KK_ANG_KEL'];
-						            $data['JLH_JIWA_2'] = $data['KK_AKHIR_JML'] + $data['KK_AKHIR_ANG_KEL'];
-
-						            $totals['WNA_L_AWAL'] += (int) ($data['WNA_L_AWAL']);
-						            $totals['WNA_P_AWAL'] += (int) ($data['WNA_P_AWAL']);
-						            $totals['WNI_L_AWAL'] += (int) ($data['WNI_L_AWAL']);
-						            $totals['WNI_P_AWAL'] += (int) ($data['WNI_P_AWAL']);
-						            $totals['KK_JLH'] += (int) ($data['KK_JLH']);
-						            $totals['KK_ANG_KEL'] += (int) ($data['KK_ANG_KEL']);
-						            $totals['JLH_JIWA_1'] += (int) ($data['JLH_JIWA_1']);
-						            $totals['WNA_L_TAMBAH_LAHIR'] += (int) ($data['WNA_L_TAMBAH_LAHIR']);
-						            $totals['WNA_P_TAMBAH_LAHIR'] += (int) ($data['WNA_P_TAMBAH_LAHIR']);
-						            $totals['WNI_L_TAMBAH_LAHIR'] += (int) ($data['WNI_L_TAMBAH_LAHIR']);
-						            $totals['WNI_P_TAMBAH_LAHIR'] += (int) ($data['WNI_P_TAMBAH_LAHIR']);
-						            $totals['WNA_L_TAMBAH_MASUK'] += (int) ($data['WNA_L_TAMBAH_MASUK']);
-						            $totals['WNA_P_TAMBAH_MASUK'] += (int) ($data['WNA_P_TAMBAH_MASUK']);
-						            $totals['WNI_L_TAMBAH_MASUK'] += (int) ($data['WNI_L_TAMBAH_MASUK']);
-						            $totals['WNI_P_TAMBAH_MASUK'] += (int) ($data['WNI_P_TAMBAH_MASUK']);
-						            $totals['WNA_L_KURANG_MATI'] += (int) ($data['WNA_L_KURANG_MATI']);
-						            $totals['WNA_P_KURANG_MATI'] += (int) ($data['WNA_P_KURANG_MATI']);
-						            $totals['WNI_L_KURANG_MATI'] += (int) ($data['WNI_L_KURANG_MATI']);
-						            $totals['WNI_P_KURANG_MATI'] += (int) ($data['WNI_P_KURANG_MATI']);
-						            $totals['WNA_L_KURANG_KELUAR'] += (int) ($data['WNA_L_KURANG_KELUAR']);
-						            $totals['WNA_P_KURANG_KELUAR'] += (int) ($data['WNA_P_KURANG_KELUAR']);
-						            $totals['WNI_L_KURANG_KELUAR'] += (int) ($data['WNI_L_KURANG_KELUAR']);
-						            $totals['WNI_P_KURANG_KELUAR'] += (int) ($data['WNI_P_KURANG_KELUAR']);
-						            $totals['WNA_L_AKHIR'] += (int) ($data['WNA_L_AKHIR']);
-						            $totals['WNA_P_AKHIR'] += (int) ($data['WNA_P_AKHIR']);
-						            $totals['WNI_L_AKHIR'] += (int) ($data['WNI_L_AKHIR']);
-						            $totals['WNI_P_AKHIR'] += (int) ($data['WNI_P_AKHIR']);
-						            $totals['KK_AKHIR_JML'] += (int) ($data['KK_AKHIR_JML']);
-						            $totals['KK_AKHIR_ANG_KEL'] += (int) ($data['KK_AKHIR_ANG_KEL']);
-						            $totals['JLH_JIWA_2'] += (int) ($data['JLH_JIWA_2']);
-						        }
-						        ?>
-								<tr>
-									<td class="padat"><?= ($key + $paging->offset + 1); ?></td>
-									<td><?= strtoupper($data['DUSUN'])?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_L_AWAL'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_P_AWAL'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_L_AWAL'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_P_AWAL'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['KK_JLH'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['KK_ANG_KEL'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['KK_JLH'] + $data['KK_ANG_KEL'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_L_TAMBAH_LAHIR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_P_TAMBAH_LAHIR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_L_TAMBAH_LAHIR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_P_TAMBAH_LAHIR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_L_TAMBAH_MASUK'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_P_TAMBAH_MASUK'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_L_TAMBAH_MASUK'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_P_TAMBAH_MASUK'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_L_KURANG_MATI'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_P_KURANG_MATI'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_L_KURANG_MATI'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_P_KURANG_MATI'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_L_KURANG_KELUAR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_P_KURANG_KELUAR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_L_KURANG_KELUAR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_P_KURANG_KELUAR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_L_AKHIR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNA_P_AKHIR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_L_AKHIR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['WNI_P_AKHIR'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['KK_AKHIR_JML'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['KK_AKHIR_ANG_KEL'], '-') ?></td>
-									<td class="padat"><?= show_zero_as($data['KK_AKHIR_JML'] + $data['KK_AKHIR_ANG_KEL'], '-') ?></td>
-									<td class="padat">-</td>
-								</tr>
-							<?php endforeach; ?>
-							<?php if ($tampil_jumlah): ?>
-								<tfoot>
-									<tr class="bg-gray color-palette">
-										<th class="padat" colspan="2">TOTAL</th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_AWAL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_AWAL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_AWAL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_AWAL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['KK_JLH'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['KK_ANG_KEL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['JLH_JIWA_1'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_TAMBAH_LAHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_TAMBAH_LAHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_TAMBAH_LAHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_TAMBAH_LAHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_TAMBAH_MASUK'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_TAMBAH_MASUK'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_TAMBAH_MASUK'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_TAMBAH_MASUK'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_KURANG_MATI'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_KURANG_MATI'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_KURANG_MATI'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_KURANG_MATI'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_KURANG_KELUAR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_KURANG_KELUAR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_KURANG_KELUAR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_KURANG_KELUAR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_AKHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_AKHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_AKHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_AKHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['KK_AKHIR_JML'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['KK_AKHIR_ANG_KEL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['JLH_JIWA_2'], '-') ?></th>
-										<th class="padat">-</th>
-									</tr>
-								</tfoot>
-							<?php endif; ?>
-						<?php endif; ?>
+					<?php if ($main): ?>
+						<?php foreach ($main as $data): ?>
+						<tr>
+							<td class="padat"><?= ($key + $paging->offset + 1); ?></td>
+							<td><?= strtoupper($data['DUSUN'])?></td>
+							<td><?= show_zero_as($data['WNA_L_AWAL'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_P_AWAL'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_L_AWAL'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_P_AWAL'],'-') ?></td>
+							<td><?= show_zero_as($data['KK_JLH'],'-') ?></td>
+							<td><?= show_zero_as($data['KK_ANG_KEL'],'-') ?></td>
+							<td><?= show_zero_as($data['KK_JLH']+$data['KK_ANG_KEL'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_L_TAMBAH_LAHIR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_P_TAMBAH_LAHIR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_L_TAMBAH_LAHIR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_P_TAMBAH_LAHIR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_L_TAMBAH_MASUK'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_P_TAMBAH_MASUK'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_L_TAMBAH_MASUK'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_P_TAMBAH_MASUK'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_L_KURANG_MATI'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_P_KURANG_MATI'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_L_KURANG_MATI'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_P_KURANG_MATI'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_L_KURANG_KELUAR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_P_KURANG_KELUAR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_L_KURANG_KELUAR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_P_KURANG_KELUAR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_L_AKHIR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNA_P_AKHIR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_L_AKHIR'],'-') ?></td>
+							<td><?= show_zero_as($data['WNI_P_AKHIR'],'-') ?></td>
+							<td><?= show_zero_as($data['KK_AKHIR_JML'],'-') ?></td>
+							<td><?= show_zero_as($data['KK_AKHIR_ANG_KEL'],'-') ?></td>
+							<td><?= show_zero_as($data['KK_AKHIR_JML']+$data['KK_AKHIR_ANG_KEL'],'-') ?></td>
+							<td>-</td>
+						</tr>
+						<?php endforeach; ?>
+					<?php endif; ?>
 					</tbody>
 				</table>
 			</td>
 		</tr>
-	</tbody>
-</table>
+	<table>
+<tbody>			

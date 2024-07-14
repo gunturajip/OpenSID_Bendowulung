@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="<?= asset('css/bagan.css') ?>">
+<link rel="stylesheet" href="<?= base_url()?>assets/css/bagan.css">
 
 <div class="content-wrapper">
 	<section class="content">
@@ -16,5 +16,5 @@
 	</section>
 </div>
 
-<?php include 'donjo-app/views/home/chart_bagan.php'; ?>
+<?php include('donjo-app/views/home/chart_bagan.php'); ?>
 

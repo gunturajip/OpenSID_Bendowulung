@@ -1,22 +1,55 @@
-<link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap.min.css') ?>" media="screen" type="text/css" />
+<?php
+
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+/**
+ * File ini:
+ *
+ * View untuk modul Peta
+ *
+ * donjo-app/views/gis/penduduk_gis.php,
+ *
+ */
+
+/**
+ *
+ * File ini bagian dari:
+ *
+ * OpenSID
+ *
+ * Sistem informasi desa sumber terbuka untuk memajukan desa
+ *
+ * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
+ *
+ * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ *
+ * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
+ * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
+ * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
+ * asal tunduk pada syarat berikut:
+ *
+ * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
+ * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
+ * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
+ *
+ * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
+ * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
+ * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
+ *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
+ */
+?>
+
+<link rel="stylesheet" href="<?= base_url()?>assets/bootstrap/css/bootstrap.min.css" media="screen" type="text/css" />
 <style type="text/css">
 	.table, th {
 		text-align: center;
-	}
-
-	.dataTable {
-		width: 100%!important;
-		table-layout: auto!important;
-		border-collapse: collapse!important;
-		margin-top: 0 !important;
-		margin-bottom: 0 !important;
-	}
-
-	.table.dataTable thead th {
-		text-align: center;
-		vertical-align: middle;
-		background-color: #d2d6de !important;
-		padding: 5px !important;
 	}
 </style>
 <div class="modal-body">
@@ -24,12 +57,12 @@
 		<input type="hidden" id="untuk_web" value="<?= $untuk_web?>">
 		<div class="row">
 			<div class="col-md-12">
-				<h4 class="box-title text-center"><b>Data Kependudukan Menurut <?= ($stat); ?></b></h4>
+				<h4 class="box-title text-center"><b>Data Kependudukan Menurut <?= ($stat);?></b></h4>
 				<center>
-					<a class="btn btn-social bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Grafik Data" onclick="grafikType();"><i class="fa fa-bar-chart"></i>&nbsp;&nbsp;Grafik Data&nbsp;&nbsp;</a>
-					<a class="btn btn-social bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Pie Data" onclick="pieType();"><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Pie Data&nbsp;&nbsp;</a>
+					<a class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Grafik Data" onclick="grafikType();"><i class="fa fa-bar-chart"></i>&nbsp;&nbsp;Grafik Data&nbsp;&nbsp;</a>
+					<a class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Pie Data" onclick="pieType();"><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Pie Data&nbsp;&nbsp;</a>
 				</center>
-				<hr style="margin-top: 10px; margin-bottom: 5px;">
+				<hr>
 				<div id="chart" hidden="true"> </div>
 				<div class="table-responsive">
 					<table class="table table-bordered dataTable table-hover nowrap">
@@ -37,7 +70,7 @@
 							<tr>
 								<th class="padat">No</th>
 								<th nowrap>Jenis Kelompok</th>
-								<?php if ($lap < 20 || ($lap > 50)): ?>
+								<?php if ($lap<20 OR ($lap>50 AND $program['sasaran']==1)): ?>
 									<th nowrap colspan="2">Laki-Laki</th>
 									<th nowrap colspan="2">Perempuan</th>
 								<?php endif; ?>
@@ -46,31 +79,26 @@
 						</thead>
 						<tbody>
 							<?php foreach ($main as $data): ?>
+								<?php if ($lap>50) $tautan_jumlah = site_url("program_bantuan/detail/1/$lap/1"); ?>
 								<tr>
 									<td class="text-center"><?= $data['no']?></td>
-									<td class="text-left"><?= strtoupper($data['nama']); ?></td>
-									<?php if ($lap < 20 || ($lap > 50)): ?>
-										<?php if ($lap < 50 || ($lap > 50 && $program['sasaran'] == 1)) {
-										    $tautan_jumlah = site_url("penduduk/statistik/{$lap}/{$data['id']}");
-										} elseif ($lap > 50 && $program['sasaran'] == 2) {
-										    $tautan_jumlah = site_url("keluarga/statistik/{$lap}/{$data['id']}");
-										} ?>
+									<td class="text-left"><?= strtoupper($data['nama']);?></td>
+									<?php if ($lap<20 OR ($lap>50 AND $program['sasaran']==1)): ?>
+										<?php if ($lap<50) $tautan_jumlah = site_url("penduduk/statistik/$lap/$data[id]"); ?>
 										<td class="text-right"><a href="<?= $tautan_jumlah?>/1"><?= $data['laki']?></a></td>
-										<td class="text-right"><?= $data['persen1']; ?></td>
+										<td class="text-right"><?= $data['persen1'];?></td>
 										<td class="text-right"><a href="<?= $tautan_jumlah?>/2"><?= $data['perempuan']?></a></td>
-										<td class="text-right"><?= $data['persen2']; ?></td>
+										<td class="text-right"><?= $data['persen2'];?></td>
 									<?php endif; ?>
 									<td class="text-right">
-										<?php if (in_array($lap, [21, 22, 23, 24, 25, 26, 27])): ?>
-											<a href="<?= site_url("keluarga/statistik/{$lap}/{$data['id']}")?>"><?= $data['jumlah']?></a>
+										<?php if (in_array($lap, array(21, 22, 23, 24, 25, 26, 27))): ?>
+											<a href="<?= site_url("keluarga/statistik/$lap/$data[id]")?>"><?= $data['jumlah']?></a>
 										<?php else: ?>
-											<?php if ($lap < 50) {
-											    $tautan_jumlah = site_url("penduduk/statistik/{$lap}/{$data['id']}");
-											} ?>
+											<?php if ($lap<50) $tautan_jumlah = site_url("penduduk/statistik/$lap/$data[id]"); ?>
 											<a href="<?= $tautan_jumlah ?>/0"><?= $data['jumlah']?></a>
 										<?php endif; ?>
 									</td>
-									<td class="text-right"><?= $data['persen']; ?></td>
+									<td class="text-right"><?= $data['persen'];?></td>
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
@@ -85,7 +113,7 @@
 	$('document').ready(function() {
 		// Nonaktfikan tautan di tabel statistik kependudukan untuk tampilan Web
 		if ($('#untuk_web').val() == 1) {
-			$('tbody a').removeAttr('href').css('text-decoration', 'none').css('color', '#000');
+			$('tbody a').removeAttr('href');
 		}
 	});
 
@@ -103,11 +131,9 @@
 					text: '<?= $stat?>'
 				},
 				categories: [
-				<?php $i = 0;
-
-foreach ($main as $data): $i++; ?>
-				<?php if ($data['jumlah'] != '-'): ?><?= "'{$i}',"; ?><?php endif; ?>
-			<?php endforeach; ?>
+				<?php $i=0; foreach ($main as $data): $i++;?>
+				<?php if ($data['jumlah'] != "-"): ?><?= "'$i',";?><?php endif; ?>
+			<?php endforeach;?>
 			]
 		},
 		yAxis: {
@@ -133,12 +159,12 @@ foreach ($main as $data): $i++; ?>
 			border:1,
 			data: [
 			<?php foreach ($main as $data): ?>
-				<?php if (! in_array($data['nama'], ['TOTAL', 'JUMLAH', 'PENERIMA'])): ?>
-					<?php if ($data['jumlah'] != '-'): ?>
+				<?php if (!in_array($data['nama'], array("TOTAL", "JUMLAH", "PENERIMA"))): ?>
+					<?php if ($data['jumlah'] != "-"): ?>
 						['<?= strtoupper($data['nama'])?>',<?= $data['jumlah']?>],
 					<?php endif; ?>
 				<?php endif; ?>
-				<?php endforeach; ?>]
+				<?php endforeach;?>]
 			}]
 		});
 
@@ -181,12 +207,12 @@ foreach ($main as $data): $i++; ?>
 				name: 'Populasi',
 				data: [
 				<?php foreach ($main as $data): ?>
-					<?php if (! in_array($data['nama'], ['TOTAL', 'JUMLAH', 'PENERIMA'])): ?>
-						<?php if ($data['jumlah'] != '-'): ?>
+					<?php if (!in_array($data['nama'], array("TOTAL", "JUMLAH", "PENERIMA"))): ?>
+						<?php if ($data['jumlah'] != "-"): ?>
 							["<?= strtoupper($data['nama'])?>",<?= $data['jumlah']?>],
 						<?php endif; ?>
 					<?php endif; ?>
-				<?php endforeach; ?>
+				<?php endforeach;?>
 				]
 			}]
 		});
@@ -194,5 +220,5 @@ foreach ($main as $data): $i++; ?>
 		$('#chart').removeAttr('hidden');
 	}
 </script>
-<script src="<?= asset('js/highcharts/exporting.js') ?>"></script>
-<script src="<?= asset('js/highcharts/highcharts-more.js') ?>"></script>
+<script src="<?= base_url()?>assets/js/highcharts/exporting.js"></script>
+<script src="<?= base_url()?>assets/js/highcharts/highcharts-more.js"></script>

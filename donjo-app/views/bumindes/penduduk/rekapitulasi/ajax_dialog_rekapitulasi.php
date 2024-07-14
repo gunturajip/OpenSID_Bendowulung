@@ -1,8 +1,8 @@
 <?php
 
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
+/**
  * File ini:
  *
  * View untuk modul Buku Administrasi Desa > Buku Rekapitulasi Jumlah Penduduk
@@ -10,7 +10,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * donjo-app/views/bumindes/penduduk/rekapitulasi/ajax_dialog_rekapitulasi.php
  */
 
-/*
+/**
+ *
  * File ini bagian dari:
  *
  * OpenSID
@@ -35,11 +36,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @copyright	  Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	  Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- *
- * @see 	https://github.com/OpenSID/OpenSID
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 ?>
 
@@ -50,14 +52,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			<div class="input-group-addon">
 				<i class="fa fa-calendar"></i>
 			</div>
-			<input class="form-control input-sm pull-right required" id="tgl_1" name="tgl_cetak" type="text" value="<?= date('d-m-Y'); ?>">
+			<input class="form-control input-sm pull-right required" id="tgl_1" name="tgl_cetak" type="text" value="<?= date('d-m-Y');?>">
 		</div>
-	</div>
-	<div class="form-group">
-		<label for="tgl_cetak">Tampilkan Jumlah</label>
-		<select class="form-control input-sm select2 required" id="tampil_jumlah" name="tampil_jumlah">
-			<option value="1">Ya</option>
-			<option value="0">Tidak</option>
-		</select>
 	</div>
 </div>

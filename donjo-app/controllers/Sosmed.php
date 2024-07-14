@@ -1,8 +1,14 @@
-<?php
-
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 /*
+ *  File ini:
  *
- * File ini bagian dari:
+ * Controller untuk modul Sosial Media Web
+ *
+ * donjo-app/controllers/Sosmed.php
+ *
+ */
+/*
+ *  File ini bagian dari:
  *
  * OpenSID
  *
@@ -11,7 +17,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,58 +32,54 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
  */
-
-defined('BASEPATH') || exit('No direct script access allowed');
 
 class Sosmed extends Admin_Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
 
-        $this->load->model('web_sosmed_model');
-        $this->modul_ini     = 'admin-web';
-        $this->sub_modul_ini = 'media-sosial';
-    }
+	public function __construct()
+	{
+		parent::__construct();
 
-    public function index(): void
-    {
-        $sosmed = $this->session->userdata('sosmed');
+		$this->load->model('web_sosmed_model');
+		$this->modul_ini = 13;
+		$this->sub_modul_ini = 53;
+	}
 
-        if (! $sosmed) {
-            $sosmed = 'facebook';
-        }
+	public function index()
+	{
+		$sosmed = $this->session->userdata('sosmed');
 
-        $data['media']       = $sosmed;
-        $data['main']        = $this->web_sosmed_model->get_sosmed($sosmed);
-        $data['list_sosmed'] = $this->web_sosmed_model->list_sosmed();
-        $data['form_action'] = site_url("sosmed/update/{$sosmed}");
+		if(!$sosmed) $sosmed = 'facebook';
 
-        $this->session->unset_userdata('sosmed');
+		$data['media'] = $sosmed;
+		$data['main'] = $this->web_sosmed_model->get_sosmed($sosmed);
+		$data['list_sosmed'] = $this->web_sosmed_model->list_sosmed();
+		$data['form_action'] = site_url("sosmed/update/$sosmed");
 
-        $this->render('sosmed/sosmed', $data);
-    }
+		$this->session->unset_userdata('sosmed');
 
-    public function tab($sosmed): void
-    {
-        $this->session->set_userdata('sosmed', $sosmed);
+		$this->render('sosmed/sosmed', $data);
+	}
 
-        redirect('sosmed');
-    }
+	public function tab($sosmed)
+	{
+		$this->session->set_userdata('sosmed', $sosmed);
 
-    public function update($sosmed): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->web_sosmed_model->update($sosmed);
-        $redirect = (empty($sosmed)) ? 'sosmed' : "sosmed/tab/{$sosmed}";
-        redirect($redirect);
-    }
+		redirect('sosmed');
+	}
+
+	public function update($sosmed)
+	{
+		$this->redirect_hak_akses('u',  $_SERVER['HTTP_REFERER']);
+		$this->web_sosmed_model->update($sosmed);
+		$redirect = (!empty($sosmed)) ? "sosmed/tab/$sosmed" : "sosmed";
+		redirect($redirect);
+	}
 }

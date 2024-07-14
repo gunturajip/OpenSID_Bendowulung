@@ -1,16 +1,18 @@
 <?php
 
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
+/**
  * File ini:
  *
  * View untuk modul Buku Administrasi Desa > Buku Induk Penduduk
  *
  * donjo-app/views/bumindes/penduduk/induk/content_induk_cetak.php,
+ *
  */
 
-/*
+/**
+ *
  * File ini bagian dari:
  *
  * OpenSID
@@ -35,11 +37,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @copyright	  Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	  Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- *
- * @see 	https://github.com/OpenSID/OpenSID
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 ?>
 
@@ -121,7 +124,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<td><?= $data['no']?></td>
 							<td><?= strtoupper($data['nama'])?></td>
 							<td><?= strtoupper($data['sex']) ?></td>
-							<td><?= (strpos($data['kawin'], 'KAWIN') !== false) ? $data['kawin'] : (($data['sex'] == 'LAKI-LAKI') ? 'DUDA' : 'JANDA') ?></td>
+							<td><?= (strpos($data['kawin'],'KAWIN') !== false) ? $data['kawin'] : (($data['sex'] == 'LAKI-LAKI') ? 'DUDA':'JANDA') ?></td>
 							<td><?= $data['tempatlahir']?></td>
 							<td><?= tgl_indo_out($data['tanggallahir'])?></td>
 							<td><?= $data['agama']?></td>
@@ -129,10 +132,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<td><?= $data['pekerjaan']?></td>
 							<td><?= strtoupper($data['bahasa_nama'])?></td>
 							<td><?= $data['warganegara']?></td>
-							<td><?= strtoupper($data['alamat'] . ' RT ' . $data['rt'] . ' / RW ' . $data['rw'] . ' ' . $this->setting->sebutan_dusun . ' ' . $data['dusun'])?></td>
+							<td><?= strtoupper($data['alamat']." RT ".$data['rt']." / RW ".$data['rw']." ".$this->setting->sebutan_dusun." ".$data['dusun'])?></td>
 							<td><?= $data['hubungan']?></td>
-							<td><?= $privasi_nik ? sensor_nik_kk($data['nik']) : ($aksi == 'unduh' ? $data['nik'] . '&nbsp' : $data['nik'])?></td>
-							<td><?= $privasi_nik ? sensor_nik_kk($data['no_kk']) : ($aksi == 'unduh' ? $data['no_kk'] . '&nbsp' : $data['no_kk'])?></td>
+							<td><?= $privasi_nik ? sensor_nik_kk($data['nik']) : ($aksi == 'unduh' ? $data['nik'].'&nbsp' : $data['nik'])?></td>
+							<td><?= $privasi_nik ? sensor_nik_kk($data['no_kk']) : ($aksi == 'unduh' ? $data['no_kk'].'&nbsp' : $data['no_kk'])?></td>
 							<td><?= $data['ket']?></td>
 						</tr>
 						<?php endforeach; ?>

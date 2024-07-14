@@ -1,6 +1,14 @@
 <?php
+/**
+ * File ini:
+ *
+ * Model untuk modul Pemetaan (Area)
+ *
+ * /donjo-app/models/Plan_area_model.php
+ *
+ */
 
-/*
+/**
  *
  * File ini bagian dari:
  *
@@ -11,7 +19,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,264 +34,255 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
+ * @package OpenSID
+ * @author  Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @copyright Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license http://www.gnu.org/licenses/gpl.html  GPL V3
+ * @link  https://github.com/OpenSID/OpenSID
  */
 
-use App\Models\Area;
+class Plan_area_model extends MY_Model {
 
-defined('BASEPATH') || exit('No direct script access allowed');
+	public function __construct()
+	{
+		parent::__construct();
+	}
 
-class Plan_area_model extends MY_Model
-{
-    public function autocomplete()
-    {
-        return $this->autocomplete_str('nama', 'area');
-    }
+	public function autocomplete()
+	{
+		return $this->autocomplete_str('nama', 'area');
+	}
 
-    private function search_sql(): void
-    {
-        if ($cari = $this->session->cari) {
-            $this->db->group_start()->like('l.nama', $cari)->group_end();
-        }
-    }
+	private function search_sql()
+	{
+		if ($cari = $this->session->cari)
+		{
+			$this->db->group_start()->like('l.nama', $cari)->group_end();
+		}
+	}
 
-    private function filter_sql(): void
-    {
-        if ($filter = $this->session->filter) {
-            $this->db->where('l.enabled', $filter);
-        }
-    }
+	private function filter_sql()
+	{
+		if ($filter = $this->session->filter)
+		{
+			$this->db->where('l.enabled', $filter);
+		}
+	}
 
-    private function polygon_sql(): void
-    {
-        if ($polygon = $this->session->polygon) {
-            $this->db->where('p.id', $polygon);
-        }
-    }
+	private function polygon_sql()
+	{
+		if ($polygon = $this->session->polygon)
+		{
+			$this->db->where('p.id', $polygon);
+		}
+	}
 
-    private function subpolygon_sql(): void
-    {
-        if ($subpolygon = $this->session->subpolygon) {
-            $this->db->where('m.id', $subpolygon);
-        }
-    }
+	private function subpolygon_sql()
+	{
+		if ($subpolygon = $this->session->subpolygon)
+		{
+			$this->db->where('m.id', $subpolygon);
+		}
+	}
 
-    public function paging($p = 1, $o = 0)
-    {
-        $this->db->select("count('l.id') as id");
+	public function paging($p=1, $o=0)
+	{
+		$this->db->select("count('l.id') as id");
 
-        $row      = $this->list_data_sql()->row_array();
-        $jml_data = $row['id'];
+		$row = $this->list_data_sql()->row_array();
+		$jml_data = $row['id'];
 
-        return $this->paginasi($p, $jml_data);
-    }
+		return $this->paginasi($p, $jml_data);
+	}
 
-    private function list_data_sql()
-    {
-        $this->config_id('l')
-            ->join('polygon p', 'l.ref_polygon = p.id', 'left')
-            ->join('polygon m', 'p.parrent = m.id', 'left');
+	private function list_data_sql()
+	{
+		$this->db
+			->join('polygon p', 'l.ref_polygon = p.id', 'left')
+			->join('polygon m', 'p.parrent = m.id', 'left');
 
-        $this->search_sql();
-        $this->filter_sql();
-        $this->polygon_sql();
-        $this->subpolygon_sql();
+		$this->search_sql();
+		$this->filter_sql();
+		$this->polygon_sql();
+		$this->subpolygon_sql();
 
-        return $this->db->get('area l');
-    }
+		return $this->db->get('area l');
+	}
 
-    public function list_data($o = 0, $offset = 0, $limit = null)
-    {
-        switch ($o) {
-            case 1:
-                $this->db->order_by('nama');
-                break;
+	public function list_data($o = 0, $offset = 0, $limit = null)
+	{
+		switch ($o)
+		{
+			case 1: $this->db->order_by('nama'); break;
+			case 2: $this->db->order_by('nama', 'DESC'); break;
+			case 3: $this->db->order_by('enabled'); break;
+			case 4: $this->db->order_by('enabled', 'DESC'); break;
+			default: $this->db->order_by('id');
+		}
 
-            case 2:
-                $this->db->order_by('nama', 'DESC');
-                break;
+		$this->db->select('l.*, p.nama as kategori, m.nama as jenis, p.simbol as simbol, p.color as color')
+			->limit($limit, $offset);
 
-            case 3:
-                $this->db->order_by('enabled');
-                break;
+		$data = $this->list_data_sql()->result_array();
 
-            case 4:
-                $this->db->order_by('enabled', 'DESC');
-                break;
+		$j = $offset;
+		for ($i=0; $i<count($data); $i++)
+		{
+			$data[$i]['no'] = $j + 1;
 
-            default:
-                $this->db->order_by('id');
-        }
+			if ($data[$i]['enabled'] == 1)
+				$data[$i]['aktif'] = "Ya";
+			else
+				$data[$i]['aktif'] = "Tidak";
 
-        $this->db->select('l.*, p.nama as kategori, m.nama as jenis, p.simbol as simbol, p.color as color')
-            ->limit($limit, $offset);
+			$j++;
+		}
+		return $data;
+	}
 
-        $data = $this->list_data_sql()->result_array();
+	private function validasi($post)
+	{
+		$data['nama'] = nomor_surat_keputusan($post['nama']);
+		$data['ref_polygon'] = $post['ref_polygon'];
+		$data['desk'] = htmlentities($post['desk']);
+		$data['enabled'] = $post['enabled'];
+		return $data;
+	}
 
-        $j       = $offset;
-        $counter = count($data);
+	public function insert()
+	{
+		$data = $this->validasi($this->input->post());
+		$area_file = $_FILES['foto']['tmp_name'];
+		$tipe_file = $_FILES['foto']['type'];
+		$nama_file = $_FILES['foto']['name'];
+		$nama_file = str_replace(' ', '-', $nama_file); 	 // normalkan nama file
+		if (!empty($area_file))
+		{
+			if ($tipe_file == "image/jpg" OR $tipe_file == "image/jpeg")
+			{
+				Uploadarea($nama_file);
+				$data['foto'] = $nama_file;
+				$outp = $this->db->insert('area', $data);
+			}
+		}
+		else
+		{
+			unset($data['foto']);
+			$outp = $this->db->insert('area', $data);
+		}
 
-        for ($i = 0; $i < $counter; $i++) {
-            $data[$i]['no'] = $j + 1;
+		status_sukses($outp); //Tampilkan Pesan
 
-            $data[$i]['aktif'] = $data[$i]['enabled'] == 1 ? 'Ya' : 'Tidak';
+	}
 
-            $j++;
-        }
+	public function update($id=0)
+	{
+		$data = $this->validasi($this->input->post());
+		$area_file = $_FILES['foto']['tmp_name'];
+		$tipe_file = $_FILES['foto']['type'];
+		$nama_file = $_FILES['foto']['name'];
+		$nama_file = str_replace(' ', '-', $nama_file); 	 // normalkan nama file
+		if ( ! empty($area_file))
+		{
+			if ($tipe_file == "image/jpg" OR $tipe_file == "image/jpeg")
+			{
+				Uploadarea($nama_file);
+				$data['foto'] = $nama_file;
+				$this->db->where('id', $id);
+				$outp = $this->db->update('area', $data);
+			}
+		}
+		else
+		{
+			unset($data['foto']);
+			$this->db->where('id', $id);
+			$outp = $this->db->update('area', $data);
+		}
+		status_sukses($outp); //Tampilkan Pesan
+	}
 
-        return $data;
-    }
+	public function delete($id='', $semua=false)
+	{
+		if ( ! $semua) $this->session->success = 1;
 
-    private function validasi($post)
-    {
-        $data['nama']        = nomor_surat_keputusan($post['nama']);
-        $data['ref_polygon'] = bilangan($post['ref_polygon']);
-        $data['desk']        = htmlentities($post['desk']);
-        $data['enabled']     = bilangan($post['enabled']);
+		$outp = $this->db->where('id', $id)->delete('area');
 
-        return $data;
-    }
+		status_sukses($outp, $gagal_saja=true); //Tampilkan Pesan
+	}
 
-    public function insert(): void
-    {
-        $data              = $this->validasi($this->input->post());
-        $data['config_id'] = identitas('id');
-        $area_file         = $_FILES['foto']['tmp_name'];
-        $nama_file         = $_FILES['foto']['name'];
-        $nama_file         = time() . '-' . str_replace(' ', '-', $nama_file);      // normalkan nama file
-        if (! empty($area_file)) {
-            $data['foto'] = UploadPeta($nama_file, LOKASI_FOTO_AREA);
-        } else {
-            unset($data['foto']);
-        }
+	public function delete_all()
+	{
+		$this->session->success = 1;
 
-        $outp = $this->db->insert('area', $data);
+		$id_cb = $this->input->post('id_cb');
+		foreach ($id_cb as $id)
+		{
+			$this->delete($id, $semua=true);
+		}
+	}
 
-        status_sukses($outp); //Tampilkan Pesan
-    }
+	public function list_polygon()
+	{
+		if ($subpolygon = $this->session->subpolygon) {
+			$this->db->where('parrent', $subpolygon);
+		}
 
-    public function update($id = 0): void
-    {
-        $data      = $this->validasi($this->input->post());
-        $old_foto  = $this->input->post('old_foto');
-        $area_file = $_FILES['foto']['tmp_name'];
-        $nama_file = $_FILES['foto']['name'];
-        $nama_file = time() . '-' . str_replace(' ', '-', $nama_file);      // normalkan nama file
-        if (! empty($area_file)) {
-            $data['foto'] = UploadPeta($nama_file, LOKASI_FOTO_AREA, $old_foto);
-        } else {
-            unset($data['foto']);
-        }
+		return $this->db->where('tipe', 2)
+			->get('polygon')
+			->result_array();
+	}
 
-        $outp = $this->config_id()->where('id', $id)->update('area', $data);
+	public function list_subpolygon()
+	{
+		return $this->db->where('tipe', 0)
+			->get('polygon')
+			->result_array();
+	}
 
-        status_sukses($outp); //Tampilkan Pesan
-    }
+	public function area_lock($id='', $val=0)
+	{
+		$outp = $this->db->where('id', $id)
+			->update('area', ['enabled' => $val]);
 
-    public function delete($id = '', $semua = false): void
-    {
-        if (! $semua) {
-            $this->session->success = 1;
-        }
+		status_sukses($outp); //Tampilkan Pesan
+	}
 
-        $area = Area::findOrFail($id);
-        $outp = $area->delete();
+	public function get_area($id=0)
+	{
+		return $this->db->where('id', $id)
+			->get('area')
+			->row_array();
+	}
 
-        if ($outp && ($area->foto_kecil || $area->foto_sedang)) {
-            unlink(FCPATH . $area->foto_kecil);
-            unlink(FCPATH . $area->foto_sedang);
-        }
+	public function update_position($id=0)
+	{
+		$data = $this->input->post();
+		$this->db->where('id', $id);
+		$outp = $this->db->update('area', $data);
 
-        status_sukses($outp, true); //Tampilkan Pesan
-    }
+		status_sukses($outp); //Tampilkan Pesan
+	}
 
-    public function delete_all(): void
-    {
-        $this->session->success = 1;
+	public function list_area()
+	{
+		$data = $this->db
+			->select('l.*, p.nama AS kategori, m.nama AS jenis, p.simbol AS simbol, p.color AS color')
+			->from('area l')
+			->join('polygon p', 'l.ref_polygon = p.id', 'left')
+			->join('polygon m', 'p.parrent = m.id', 'left')
+			->where('l.enabled', 1)
+			->where('p.enabled', 1)
+			->where('m.enabled', 1)
+			->get()->result_array();
+		return $data;
+	}
 
-        $id_cb = $this->input->post('id_cb');
-
-        foreach ($id_cb as $id) {
-            $this->delete($id, true);
-        }
-    }
-
-    public function list_polygon()
-    {
-        if ($subpolygon = $this->session->subpolygon) {
-            $this->db->where('parrent', $subpolygon);
-        }
-
-        return $this->config_id()
-            ->where('tipe', 2)
-            ->get('polygon')
-            ->result_array();
-    }
-
-    public function list_subpolygon()
-    {
-        return $this->config_id()
-            ->where('tipe', 0)
-            ->get('polygon')
-            ->result_array();
-    }
-
-    public function area_lock($id = '', $val = 0): void
-    {
-        $outp = $this->config_id()
-            ->where('id', $id)
-            ->update('area', ['enabled' => $val]);
-
-        status_sukses($outp); //Tampilkan Pesan
-    }
-
-    public function get_area($id = 0)
-    {
-        return $this->config_id()
-            ->where('id', $id)
-            ->get('area')
-            ->row_array();
-    }
-
-    public function update_position($id = 0): void
-    {
-        $data = $this->input->post();
-        $this->db->where('id', $id);
-        $outp = $data['path'] !== '[[]]' ? $this->config_id()->update('area', $data) : '';
-
-        status_sukses($outp, $gagal_saja = false, $msg = 'titik koordinat area harus diisi'); //Tampilkan Pesan
-    }
-
-    public function list_area($status = null)
-    {
-        if (null !== $status) {
-            $this->db
-                ->where('l.enabled', $status)
-                ->where('p.enabled', $status)
-                ->where('m.enabled', $status);
-        }
-
-        return $this->config_id('l')
-            ->select('l.*, p.nama AS kategori, m.nama AS jenis, p.simbol AS simbol, p.color AS color')
-            ->from('area l')
-            ->join('polygon p', 'l.ref_polygon = p.id', 'left')
-            ->join('polygon m', 'p.parrent = m.id', 'left')
-            ->where('l.ref_polygon !=', 0)
-            ->get()
-            ->result_array();
-    }
-
-    public function kosongkan_path($id): void
-    {
-        $this->config_id()
-            ->set('path', null)
-            ->where('id', $id)
-            ->update('area');
-    }
+	public function kosongkan_path($id)
+	{
+		$this->db
+			->set('path', NULL)
+			->where('id', $id)
+			->update('area');
+	}
 }

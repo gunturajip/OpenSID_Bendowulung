@@ -1,3 +1,47 @@
+<?php
+/*
+ * File ini:
+ *
+ * Views di Modul Kependudukan
+ *
+ * donjo-app/views/sid/kependudukan/penduduk_detail.php
+ *
+ */
+
+/**
+ *
+ * File ini bagian dari:
+ *
+ * OpenSID
+ *
+ * Sistem informasi desa sumber terbuka untuk memajukan desa
+ *
+ * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
+ *
+ * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ *
+ * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
+ * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
+ * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
+ * asal tunduk pada syarat berikut:
+
+ * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
+ * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
+ * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
+
+ * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
+ * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
+ * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
+ *
+ * @package OpenSID
+ * @author  Tim Pengembang OpenDesa
+ * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license http://www.gnu.org/licenses/gpl.html  GPL V3
+ * @link  https://github.com/OpenSID/OpenSID
+ */
+?>
 <!-- TODO: Pindahkan ke external css -->
 <style>
 	.table {
@@ -12,7 +56,7 @@
 	<section class="content-header">
 		<h1>Biodata Penduduk</h1>
 		<ol class="breadcrumb">
-			<li><a href="<?= site_url('beranda')?>"><i class="fa fa-home"></i> Beranda</a></li>
+			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
 			<li><a href="<?= site_url('penduduk/clear')?>"> Daftar Penduduk</a></li>
 			<li class="active">Biodata Penduduk</li>
 		</ol>
@@ -23,30 +67,15 @@
 				<div class="col-md-12">
 					<div class="box box-info">
 						<div class="box-header">
-							<a href="<?= site_url("penduduk/dokumen/{$penduduk['id']}")?>" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Manajemen Dokumen Penduduk" ><i class="fa fa-book"></i> Manajemen Dokumen</a>
-							<?php if (can('u')): ?>
-								<?php if ($penduduk['status_dasar_id'] == 1): ?>
-									<a href="<?= site_url("penduduk/form/{$p}/{$o}/{$penduduk['id']}")?>" class="btn btn-social btn-flat btn-warning btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Ubah Biodata" ><i class="fa fa-edit"></i> Ubah Biodata</a>
-								<?php endif; ?>
+							<a href="<?= site_url("penduduk/dokumen/$penduduk[id]")?>" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Manajemen Dokumen Penduduk" ><i class="fa fa-book"></i> Manajemen Dokumen</a>
+							<?php if ($penduduk['status_dasar_id']==1): ?>
+								<a href="<?= site_url("penduduk/form/$p/$o/$penduduk[id]")?>" class="btn btn-social btn-flat btn-warning btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Ubah Biodata" ><i class="fa fa-edit"></i> Ubah Biodata</a>
 							<?php endif; ?>
-							<a href="<?= site_url("penduduk/cetak_biodata/{$penduduk['id']}")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Biodata" target="_blank"><i class="fa fa-print"></i>Cetak Biodata</a>
-							<?php if ($penduduk['no_kk'] && $penduduk['status_dasar_id'] == 1 && ! empty($penduduk['id_kk'])): ?>
-								<a href="<?= site_url("keluarga/anggota/{$p}/{$o}/{$penduduk['id_kk']}")?>" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Anggota Keluarga" ><i class="fa fa-users"></i> Anggota Keluarga</a>
+							<a href="<?= site_url("penduduk/cetak_biodata/$penduduk[id]")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Biodata" target="_blank"><i class="fa fa-print"></i>Cetak Biodata</a>
+							<?php if ($penduduk['status_dasar_id'] == 1 and !empty($penduduk['id_kk'])): ?>
+								<a href="<?= site_url("keluarga/anggota/$p/$o/$penduduk[id_kk]")?>" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Anggota Keluarga" ><i class="fa fa-users"></i> Anggota Keluarga</a>
 							<?php endif; ?>
-							<?php if (can('u')): ?>
-								<div class="btn-group btn-group-vertical">
-									<a class="btn btn-social btn-flat btn-success btn-sm" data-toggle="dropdown"><i class='fa fa-plus'></i> Tambah Penduduk</a>
-									<ul class="dropdown-menu" role="menu">
-										<li>
-											<a href="<?= site_url('penduduk/form_peristiwa/1'); ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Tambah Data Penduduk Lahir"><i class="fa fa-plus"></i>  Penduduk Lahir</a>
-										</li>
-										<li>
-											<a href="<?= site_url('penduduk/form_peristiwa/5'); ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Tambah Data Penduduk Masuk"><i class="fa fa-plus"></i>  Penduduk Masuk</a>
-										</li>
-									</ul>
-								</div>
-							<?php endif; ?>
-							<a href="<?= site_url('penduduk/clear')?>" class="btn btn-social btn-flat btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"  title="Kembali Ke Daftar Penduduk">
+							<a href="<?= site_url("penduduk/clear")?>" class="btn btn-social btn-flat btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"  title="Kembali Ke Daftar Penduduk">
 								<i class="fa fa-arrow-circle-left"></i>Kembali Ke Daftar Penduduk
 							</a>
 						</div>
@@ -56,22 +85,22 @@
 									<div class="box-header with-border">
 										<h3 class="box-title">Biodata Penduduk (NIK : <?= $penduduk['nik']?>)</h3>
 										<br>
-										<?php if (! empty($penduduk['nama_pendaftar'])): ?>
+										<?php if (!empty($penduduk['nama_pendaftar'])): ?>
 											<p class="kecil">
 												Terdaftar pada:
-												<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['created_at']); ?>
+												<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['created_at']);?>
 												<i class="fa fa-user"></i> <?= $penduduk['nama_pendaftar']?>
 											</p>
 										<?php else: ?>
 											<p class="kecil">
 												Terdaftar sebelum:
-												<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['created_at']); ?>
+												<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['created_at']);?>
 											</p>
 										<?php endif; ?>
-										<?php if (! empty($penduduk['nama_pengubah'])): ?>
+										<?php if (!empty($penduduk['nama_pengubah'])): ?>
 											<p class="kecil">
 												Terakhir diubah:
-												<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['updated_at']); ?>
+												<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['updated_at']);?>
 												<i class="fa fa-user"></i> <?= $penduduk['nama_pengubah']?>
 											</p>
 										<?php endif; ?>
@@ -82,14 +111,14 @@
 										<table class="table table-bordered table-striped table-hover" >
 											<tr>
 												<td colspan="3">
-													<img class="penduduk" src="<?= AmbilFoto($penduduk['foto'], '', $penduduk['id_sex'])?>" alt="Foto Penduduk">
+													<img class="penduduk profile-user-img img-responsive img-circle" src="<?= AmbilFoto($penduduk['foto'], '', $penduduk['id_sex'])?>" alt="Foto">
 												</td>
 											</tr>
 											<div class="table-responsive">
 												<table class="table table-bordered table-striped table-hover" >
 													<tbody>
 														<tr>
-															<td>Status Dasar</td><td >:</td><td><span class="<?= ($penduduk['status_dasar_id'] != 1) ? 'label label-danger' : ''?>"><strong><?= strtoupper($penduduk['status_dasar'])?></strong></span></td>
+															<td>Status Dasar</td><td >:</td><td><span class="<?= ($penduduk['status_dasar_id']!=1) ? 'label label-danger' : ''?>"><strong><?= strtoupper($penduduk['status_dasar'])?></strong></span></td>
 														</tr>
 														<tr>
 															<td width="300">Nama</td>
@@ -119,7 +148,7 @@
 															<td>Nomor Kartu Keluarga</td><td >:</td>
 															<td>
 																<?= $penduduk['no_kk']?>
-																<?php if ($penduduk['status_dasar_id'] != '1' && $penduduk['no_kk'] != $penduduk['log_no_kk']): ?>
+																<?php if ($penduduk['status_dasar_id'] <> '1' AND $penduduk['no_kk'] <> $penduduk['log_no_kk']): ?>
 																	(waktu peristiwa {<?= $penduduk['status_dasar']?>}: {<?= $penduduk['log_no_kk']?>})
 																<?php endif; ?>
 															</td>
@@ -215,6 +244,12 @@
 															<th colspan="3" class="subtitle_head"><strong>ALAMAT</strong></th>
 														</tr>
 														<tr>
+															<td>Nomor Telepon</td><td >:</td><td><?= strtoupper($penduduk['telepon'])?></td>
+														</tr>
+														<tr>
+															<td>Alamat Email</td><td >:</td><td><?= strtoupper($penduduk['email'])?></td>
+														</tr>
+														<tr>
 															<td>Alamat</td><td >:</td><td><?= strtoupper($penduduk['alamat'])?></td>
 														</tr>
 														<tr>
@@ -227,24 +262,12 @@
 															<td>Alamat Sebelumnya</td><td >:</td><td><?= strtoupper($penduduk['alamat_sebelumnya'])?></td>
 														</tr>
 														<tr>
-															<td>Nomor Telepon</td><td >:</td><td><?= strtoupper($penduduk['telepon'])?></td>
-														</tr>
-														<tr>
-															<td>Alamat Email</td><td >:</td><td><?= strtoupper($penduduk['email'])?></td>
-														</tr>
-														<tr>
-															<td>Telegram</td><td >:</td><td><?= $penduduk['telegram']?></td>
-														</tr>
-														<tr>
-															<td>Cara Hubung Warga</td><td >:</td><td><?= $penduduk['hubung_warga']?></td>
-														</tr>
-														<tr>
 															<th colspan="3" class="subtitle_head"><strong>STATUS KAWIN</strong></th>
 														</tr>
 														<tr>
 															<td>Status Kawin</td><td >:</td><td><?= strtoupper($penduduk['kawin'])?></td>
 														</tr>
-														<?php if ($penduduk['status_kawin'] != 1): ?>
+														<?php if ($penduduk['status_kawin'] <> 1): ?>
 															<tr>
 																<td>Akta perkawinan</td><td >:</td><td><?= strtoupper($penduduk['akta_perkawinan'])?></td>
 															</tr>
@@ -252,12 +275,12 @@
 																<td>Tanggal perkawinan</td><td >:</td><td><?= strtoupper($penduduk['tanggalperkawinan'])?></td>
 															</tr>
 														<?php endif ?>
-														<?php if ($penduduk['status_kawin'] != 1 && $penduduk['status_kawin'] != 2): ?>
+														<?php if ($penduduk['status_kawin'] <> 1 and $penduduk['status_kawin'] <> 2): ?>
 															<tr>
 																<td>Akta perceraian</td><td >:</td><td><?= strtoupper($penduduk['akta_perceraian'])?></td>
 															</tr>
 															<tr>
-																<td>Tanggal perceraian</td><td >:</td><td><?= strtoupper($penduduk['tanggalperceraian'])?></td>
+																<td>Akta perceraian</td><td >:</td><td><?= strtoupper($penduduk['tanggalperceraian'])?></td>
 															</tr>
 														<?php endif ?>
 														<tr>
@@ -279,7 +302,7 @@
 														<?php endif ?>
 														<?php if ($penduduk['id_sex'] == 2): ?>
 															<tr>
-																<td>Status Kehamilan</td><td >:</td><td><?= $penduduk['hamil'] == '1' ? 'HAMIL' : 'TIDAK HAMIL'?></td>
+																<td>Status Kehamilan</td><td >:</td><td><?= empty($penduduk['hamil']) ? 'TIDAK HAMIL' : 'HAMIL'?></td>
 															</tr>
 														<?php endif; ?>
 														<tr>
@@ -323,11 +346,11 @@
 																			<?php foreach ($program['programkerja'] as $key => $item): ?>
 																				<tr>
 																					<td class="text-center"><?= $key + 1?></td>
-																					<td><?= fTampilTgl($item['sdate'], $item['edate']); ?></td>
-																					<td><a href="<?= site_url("program_bantuan/data_peserta/{$item['peserta_id']}"); ?>"><?= $item['nama']; ?></a></td>
-																					<td><?= $item['ndesc']; ?></td>
+																					<td><?= fTampilTgl($item["sdate"], $item["edate"]); ?></td>
+																					<td><a href="<?= site_url("program_bantuan/data_peserta/$item[peserta_id]"); ?>"><?= $item["nama"]; ?></a></td>
+																					<td><?= $item["ndesc"];?></td>
 																				</tr>
-																			<?php endforeach; ?>
+																			<?php endforeach;?>
 																		</tbody>
 																	</table>
 																</div>
@@ -352,14 +375,11 @@
 																			<?php foreach ($list_dokumen as $key => $data): ?>
 																				<tr>
 																					<td class="padat"><?= $key + 1; ?></td>
-																					<td class="aksi">
-																						<a href="<?= site_url("{$this->controller}/unduh_berkas/{$data['id']}"); ?>" class="btn bg-purple btn-flat btn-sm" title="Unduh Dokumen"><i class="fa fa-download"></i></a>
-																						<a href="<?= site_url("{$this->controller}/unduh_berkas/{$data['id']}/1"); ?>" class="btn bg-info btn-flat btn-sm" title="Lihat Dokumen"><i class="fa fa-eye"></i></a>
-																					</td>
+																					<td class="aksi"><a href="<?= site_url("{$this->controller}/unduh_berkas/{$data['id']}"); ?>" class="btn bg-purple btn-flat btn-sm" title="Unduh Dokumen"><i class="fa fa-download"></i></a></td>
 																					<td><?= $data['nama']?></td>
 																					<td><?= tgl_indo2($data['tgl_upload']); ?></td>
 																				</tr>
-																			<?php endforeach; ?>
+																			<?php endforeach;?>
 																		</tbody>
 																	</table>
 																</div>

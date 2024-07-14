@@ -1,7 +1,7 @@
-<script src="<?= asset('js/jquery.validate.min.js') ?>"></script>
-<script src="<?= asset('js/validasi.js') ?>"></script>
-<script src="<?= asset('js/localization/messages_id.js') ?>"></script>
-<script src="<?= asset('js/script.js') ?>"></script>
+<script src="<?= base_url()?>assets/js/jquery.validate.min.js"></script>
+<script src="<?= base_url()?>assets/js/validasi.js"></script>
+<script src="<?= base_url()?>assets/js/localization/messages_id.js"></script>
+<script src="<?= base_url()?>assets/js/script.js"></script>
 
 <style type="text/css">
 	.horizontal {
@@ -43,7 +43,7 @@
 									<option value="-1">-- Tidak ada atasan (keluarkan dari bagan) --</option>
 									<?php foreach ($atasan as $data): ?>
 										<option value="<?= $data['id']?>" <?php selected($pamong['atasan'], $data['id']); ?>><?= $data['nama']?> (<?= $data['jabatan']?>)</option>
-									<?php endforeach; ?>
+									<?php endforeach;?>
 								</select>
 							</div>
 						</div>
@@ -57,7 +57,7 @@
 							<label class="control-label col-sm-3">Warna</label>
 							<div class="col-sm-9">
 								<div class="input-group my-colorpicker2">
-									<input type="text" name="bagan_warna" class="form-control input-sm warna" placeholder="#FFFFFF" value="">
+									<input type="text" name="bagan_warna" class="form-control input-sm" placeholder="#FFFFFF" value="">
 									<div class="input-group-addon input-sm">
 										<i></i>
 									</div>

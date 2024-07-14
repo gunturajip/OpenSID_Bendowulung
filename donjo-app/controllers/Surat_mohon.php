@@ -1,8 +1,14 @@
-<?php
-
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 /*
+ *  File ini:
  *
- * File ini bagian dari:
+ * Controller untuk modul Layanan Mandiri
+ *
+ * donjo-app/controllers/Surat_mohon.php
+ *
+ */
+/*
+ *  File ini bagian dari:
  *
  * OpenSID
  *
@@ -11,7 +17,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,132 +32,120 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 
-use App\Models\SyaratSurat;
+class Surat_mohon extends Admin_Controller {
 
-defined('BASEPATH') || exit('No direct script access allowed');
+	public function __construct()
+	{
+		parent::__construct();
 
-class Surat_mohon extends Admin_Controller
-{
-    public function __construct()
-    {
-        parent::__construct();
-        $this->modul_ini     = 'layanan-surat';
-        $this->sub_modul_ini = 'daftar-persyaratan';
-        isCan('b');
-    }
+		$this->load->model('lapor_model');
+		$this->modul_ini = 4;
+		$this->sub_modul_ini = 97;
+	}
 
-    public function index()
-    {
-        return view('admin.syaratan_surat.index');
-    }
+	public function clear()
+	{
+		unset($_SESSION['cari']);
+		unset($_SESSION['filter']);
+		redirect('surat_mohon');
+	}
 
-    public function datatables()
-    {
-        if ($this->input->is_ajax_request()) {
-            $query = SyaratSurat::formatSuratExist();
+	public function index($p = 1, $o = 0)
+	{
+		$data['p'] = $p;
+		$data['o'] = $o;
 
-            return datatables()->of($query)
-                ->addColumn('ceklist', static function ($row) {
-                    if (can('h')) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->ref_syarat_id . '"/>';
-                    }
-                })
-                ->addIndexColumn()
-                ->addColumn('aksi', static function ($row): string {
-                    if (can('u')) {
-                        $aksi = '<a href="' . route('surat_mohon.form', $row->ref_syarat_id) . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a> ';
-                    }
+		if (isset($_SESSION['cari']))
+			$data['cari'] = $_SESSION['cari'];
+		else $data['cari'] = '';
 
-                    if (can('u') && $row->jumlah_format_surat == '0') {
-                        $aksi .= '<a href="#" data-href="' . route('surat_mohon.delete', $row->ref_syarat_id) . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
-                    }
+		if (isset($_SESSION['filter']))
+			$data['filter'] = $_SESSION['filter'];
+		else $data['filter'] = '';
 
-                    return $aksi;
-                })
-                ->rawColumns(['ceklist', 'aksi'])
-                ->make();
-        }
+		if (isset($_POST['per_page']))
+			$_SESSION['per_page'] = $_POST['per_page'];
+		$data['per_page'] = $_SESSION['per_page'];
 
-        return show_404();
-    }
+		$data['paging'] = $this->lapor_model->paging($p, $o);
+		$data['main'] = $this->lapor_model->list_data($o, $data['paging']->offset, $data['paging']->per_page);
+		$data['keyword'] = $this->lapor_model->autocomplete();
 
-    public function form($id = '')
-    {
-        isCan('u');
+		$this->render('surat_master/surat_mohon_table', $data);
+	}
 
-        if ($id) {
-            $action      = 'Ubah';
-            $form_action = route('surat_mohon.update', $id);
+	public function form($p = 1, $o = 0, $id = '')
+	{
+		$this->redirect_hak_akses('u',  $_SERVER['HTTP_REFERER']);
+		$data['p'] = $p;
+		$data['o'] = $o;
 
-            $ref_syarat_surat = SyaratSurat::findOrFail($id);
-        } else {
-            $action           = 'Tambah';
-            $form_action      = route('surat_mohon.insert');
-            $ref_syarat_surat = null;
-        }
+		if ($id)
+		{
+			$data['ref_syarat_surat'] = $this->lapor_model->get_surat($id);
+			$data['form_action'] = site_url("surat_mohon/update/$p/$o/$id");
+		}
+		else
+		{
+			$data['ref_syarat_surat'] = NULL;
+			$data['form_action'] = site_url("surat_mohon/insert");
+		}
 
-        return view('admin.syaratan_surat.form', ['action' => $action, 'form_action' => $form_action, 'ref_syarat_surat' => $ref_syarat_surat]);
-    }
+		$this->render('surat_master/surat_mohon_form', $data);
+	}
 
-    public function insert(): void
-    {
-        isCan('u');
+	public function search()
+	{
+		$cari = $this->input->post('cari');
+		if ($cari != '')
+			$_SESSION['cari'] = $cari;
+		else unset($_SESSION['cari']);
+		redirect('surat_mohon');
+	}
 
-        if (SyaratSurat::create(static::validate($this->request))) {
-            redirect_with('success', 'Berhasil Tambah Data');
-        }
-        redirect_with('error', 'Gagal Tambah Data');
-    }
+	public function filter()
+	{
+		$filter = $this->input->post('filter');
+		if ($filter != 0)
+			$_SESSION['filter'] = $filter;
+		else unset($_SESSION['filter']);
+		redirect('surat_mohon');
+	}
 
-    public function update($id = ''): void
-    {
-        isCan('u');
+	public function insert()
+	{
+		$this->redirect_hak_akses('u',  $_SERVER['HTTP_REFERER']);
+		$this->lapor_model->insert_ref_surat();
+		redirect('surat_mohon');
+	}
 
-        $data = SyaratSurat::findOrFail($id);
+	public function update($p = 1, $o = 0, $id = '')
+	{
+		$this->redirect_hak_akses('u',  $_SERVER['HTTP_REFERER']);
+		$this->lapor_model->update($id);
+		redirect("surat_mohon/index/$p/$o");
+	}
 
-        if ($data->update(static::validate($this->request))) {
-            redirect_with('success', 'Berhasil Ubah Data');
-        }
-        redirect_with('error', 'Gagal Ubah Data');
-    }
+	public function delete($p = 1, $o = 0, $id = '')
+	{
+		$this->redirect_hak_akses('h', "surat_mohon/index/$p/$o");
+		$this->lapor_model->delete($id);
+		redirect("surat_mohon/index/$p/$o");
+	}
 
-    public function delete($id = ''): void
-    {
-        isCan('h');
+	public function delete_all($p = 1, $o = 0)
+	{
+		$this->redirect_hak_akses('h', "surat_mohon/index/$p/$o");
+		$this->lapor_model->delete_all();
+		redirect("surat_mohon/index/$p/$o");
+	}
 
-        if (SyaratSurat::deleteFormatSuratExist($id)) {
-            redirect_with('success', 'Berhasil Hapus Data');
-        }
-        redirect_with('error', 'Gagal Hapus Data');
-    }
-
-    public function deleteAll(): void
-    {
-        isCan('h');
-
-        foreach ($this->request['id_cb'] as $id) {
-            if (! SyaratSurat::deleteFormatSuratExist($id)) {
-                redirect_with('error', 'Gagal Hapus Data');
-            }
-        }
-
-        redirect_with('success', 'Berhasil Hapus Data');
-    }
-
-    // Hanya filter inputan
-    protected static function validate($request = [])
-    {
-        return [
-            'ref_syarat_nama' => nama_terbatas($request['ref_syarat_nama']),
-        ];
-    }
 }

@@ -1,7 +1,17 @@
 <?php
 
+defined('BASEPATH') or exit('No direct script access allowed');
+
 /*
+ * File ini:
  *
+ * Controller untuk modul Inventaris
+ *
+ * donjo-app/controllers/Inventaris_jalan.php
+ *
+ */
+
+/*
  * File ini bagian dari:
  *
  * OpenSID
@@ -11,7 +21,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,122 +36,118 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 
-use App\Models\Pamong;
+class Inventaris_jalan extends Admin_Controller {
 
-defined('BASEPATH') || exit('No direct script access allowed');
+	public function __construct()
+	{
+		parent::__construct();
+		$this->load->model(['inventaris_jalan_model', 'pamong_model', 'aset_model']);
+		$this->modul_ini = 15;
+		$this->sub_modul_ini = 61;
+		$this->set_minsidebar(1);
+	}
 
-class Inventaris_jalan extends Admin_Controller
-{
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model(['inventaris_jalan_model', 'pamong_model', 'aset_model']);
-        $this->modul_ini     = 'sekretariat';
-        $this->sub_modul_ini = 61;
-    }
+	public function index()
+	{
+		$data['main'] = $this->inventaris_jalan_model->list_inventaris();
+		$data['total'] = $this->inventaris_jalan_model->sum_inventaris();
+		$data['pamong'] = $this->pamong_model->list_data();
+		$data['tip'] = 1;
+		
+		$this->render('inventaris/jalan/table', $data);
+	}
 
-    public function index(): void
-    {
-        $data['main']   = $this->inventaris_jalan_model->list_inventaris();
-        $data['total']  = $this->inventaris_jalan_model->sum_inventaris();
-        $data['pamong'] = Pamong::penandaTangan()->get();
-        $data['tip']    = 1;
+	public function view($id)
+	{
+		$data['main'] = $this->inventaris_jalan_model->view($id);
+		$data['tip'] = 1;
+		
+		$this->render('inventaris/jalan/view_inventaris', $data);
+	}
 
-        $this->render('inventaris/jalan/table', $data);
-    }
+	public function view_mutasi($id)
+	{
+		$data['main'] = $this->inventaris_jalan_model->view_mutasi($id);
+		$data['tip'] = 2;
+		
+		$this->render('inventaris/jalan/view_mutasi', $data);
+	}
 
-    public function view($id): void
-    {
-        $data['main'] = $this->inventaris_jalan_model->view($id);
-        $data['tip']  = 1;
+	public function edit($id)
+	{
+		$this->redirect_hak_akses('u');
+		$data['main'] = $this->inventaris_jalan_model->view($id);
+		$data['aset'] = $this->aset_model->list_aset(5);
+		$data['count_reg'] = $this->inventaris_jalan_model->count_reg();
+		$data['get_kode'] = $this->header['desa'];
+		$data['kd_reg'] = $this->inventaris_jalan_model->list_inventaris_kd_register();
+		$data['tip'] = 1;
+		
+		$this->render('inventaris/jalan/edit_inventaris', $data);
+	}
 
-        $this->render('inventaris/jalan/view_inventaris', $data);
-    }
+	public function edit_mutasi($id)
+	{
+		$this->redirect_hak_akses('u');
+		$data['main'] = $this->inventaris_jalan_model->edit_mutasi($id);
+		$data['tip'] = 2;
+		
+		$this->render('inventaris/jalan/edit_mutasi', $data);
+	}
 
-    public function view_mutasi($id): void
-    {
-        $data['main'] = $this->inventaris_jalan_model->view_mutasi($id);
-        $data['tip']  = 2;
+	public function form()
+	{
+		$this->redirect_hak_akses('u');
+		$data['tip'] = 1;
+		$data['get_kode'] = $this->header['desa'];
+		$data['aset'] = $this->aset_model->list_aset(5);
+		$data['count_reg'] = $this->inventaris_jalan_model->count_reg();
+		
+		$this->render('inventaris/jalan/form_tambah', $data);
+	}
 
-        $this->render('inventaris/jalan/view_mutasi', $data);
-    }
+	public function form_mutasi($id)
+	{
+		$this->redirect_hak_akses('u');
+		$data['main'] = $this->inventaris_jalan_model->view($id);
+		$data['tip'] = 2;
+		
+		$this->render('inventaris/jalan/form_mutasi', $data);
+	}
 
-    public function edit($id): void
-    {
-        $this->redirect_hak_akses('u');
-        $data['main']      = $this->inventaris_jalan_model->view($id);
-        $data['aset']      = $this->aset_model->list_aset(5);
-        $data['count_reg'] = $this->inventaris_jalan_model->count_reg();
-        $data['get_kode']  = $this->header['desa'];
-        $data['kd_reg']    = $this->inventaris_jalan_model->list_inventaris_kd_register();
-        $data['tip']       = 1;
+	public function mutasi()
+	{
+		$data['main'] = $this->inventaris_jalan_model->list_mutasi_inventaris();
+		$data['tip'] = 2;
+		
+		$this->render('inventaris/jalan/table_mutasi', $data);
+	}
 
-        $this->render('inventaris/jalan/edit_inventaris', $data);
-    }
+	public function cetak($tahun, $penandatangan)
+	{
+		$data['header'] = $this->header['desa'];
+		$data['total'] = $this->inventaris_jalan_model->sum_print($tahun);
+		$data['print'] = $this->inventaris_jalan_model->cetak($tahun);
+		$data['pamong'] = $this->pamong_model->get_data($penandatangan);
+		
+		$this->load->view('inventaris/jalan/inventaris_print', $data);
+	}
 
-    public function edit_mutasi($id): void
-    {
-        $this->redirect_hak_akses('u');
-        $data['main'] = $this->inventaris_jalan_model->edit_mutasi($id);
-        $data['tip']  = 2;
+	public function download($tahun, $penandatangan)
+	{
+		$data['header'] = $this->header['desa'];
+		$data['total'] = $this->inventaris_jalan_model->sum_print($tahun);
+		$data['print'] = $this->inventaris_jalan_model->cetak($tahun);
+		$data['pamong'] = $this->pamong_model->get_data($penandatangan);
 
-        $this->render('inventaris/jalan/edit_mutasi', $data);
-    }
-
-    public function form(): void
-    {
-        $this->redirect_hak_akses('u');
-        $data['tip']       = 1;
-        $data['get_kode']  = $this->header['desa'];
-        $data['aset']      = $this->aset_model->list_aset(5);
-        $data['count_reg'] = $this->inventaris_jalan_model->count_reg();
-
-        $this->render('inventaris/jalan/form_tambah', $data);
-    }
-
-    public function form_mutasi($id): void
-    {
-        $this->redirect_hak_akses('u');
-        $data['main'] = $this->inventaris_jalan_model->view($id);
-        $data['tip']  = 2;
-
-        $this->render('inventaris/jalan/form_mutasi', $data);
-    }
-
-    public function mutasi(): void
-    {
-        $data['main'] = $this->inventaris_jalan_model->list_mutasi_inventaris();
-        $data['tip']  = 2;
-
-        $this->render('inventaris/jalan/table_mutasi', $data);
-    }
-
-    public function cetak($tahun, $penandatangan): void
-    {
-        $data['header'] = $this->header['desa'];
-        $data['total']  = $this->inventaris_jalan_model->sum_print($tahun);
-        $data['print']  = $this->inventaris_jalan_model->cetak($tahun);
-        $data['pamong'] = $this->pamong_model->get_data($penandatangan);
-
-        $this->load->view('inventaris/jalan/inventaris_print', $data);
-    }
-
-    public function download($tahun, $penandatangan): void
-    {
-        $data['header'] = $this->header['desa'];
-        $data['total']  = $this->inventaris_jalan_model->sum_print($tahun);
-        $data['print']  = $this->inventaris_jalan_model->cetak($tahun);
-        $data['pamong'] = $this->pamong_model->get_data($penandatangan);
-
-        $this->load->view('inventaris/jalan/inventaris_excel', $data);
-    }
+		$this->load->view('inventaris/jalan/inventaris_excel', $data);
+	}
 }

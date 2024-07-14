@@ -1,16 +1,18 @@
 <?php
 
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
+/**
  * File ini:
  *
  * View untuk modul Statistik Kependudukan
  *
  * donjo-app/views/statistik/penduduk_grafik_web.php,
+ *
  */
 
-/*
+/**
+ *
  * File ini bagian dari:
  *
  * OpenSID
@@ -35,16 +37,17 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @copyright	  Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	  Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- *
- * @see 	https://github.com/OpenSID/OpenSID
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 ?>
 
 <script type="text/javascript">
-	const rawData_<?=$lap?> = Object.values(<?= json_encode($stat, JSON_THROW_ON_ERROR) ?>);
+	const rawData_<?=$lap?> = Object.values(<?= json_encode($stat) ?>);
 	const type_<?=$lap?> = '<?= $tipe == 1 ? 'column' : 'pie' ?>';
 	const legend_<?=$lap?> = Boolean(!<?= ($tipe) ?>);
 	let categories_<?=$lap?> = [];
@@ -185,7 +188,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	tr.lebih {
 		display: none;
 	}
-
+	
 	.input-sm {
 		padding: 4px 4px;
 	}
@@ -240,48 +243,40 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			</tr>
 			</thead>
 			<tbody>
-				<?php $i = 0;
-$l           = 0;
-$p           = 0;
-$hide        = '';
-$h           = 0;
-$jm1         = 1;
-$jm          = count($stat); ?>
+				<?php $i=0; $l=0; $p=0; $hide=""; $h=0; $jm1=1; $jm = count($stat);?>
 				<?php foreach ($stat as $data):?>
 					<?php $jm1++; ?>
 					<?php $h++; ?>
-					<?php if ($h > 12 && $jm > 10): ?>
-						<?php $hide = 'lebih'; ?>
-					<?php endif; ?>
+					<?php if ($h > 12 AND $jm > 10): ?>
+						<?php $hide = "lebih"; ?>
+					<?php endif;?>
 					<tr class="<?=$hide?>">
 						<td class="angka">
 							<?php if ($jm1 > $jm - 2):?>
 								<?=$data['no']?>
 							<?php else:?>
 								<?=$h?>
-							<?php endif; ?>
+							<?php endif;?>
 						</td>
 						<td><?=$data['nama']?></td>
-						<td class="angka <?php if (($jm1 <= $jm - 2) && ($data['jumlah'] == 0)) {
-						    echo 'nol';
-						} ?>"><?=$data['jumlah']?></td>
+						<td class="angka <?php ($jm1 <= $jm - 2) and ($data['jumlah'] == 0) and print('nol')?>"><?=$data['jumlah']?></td>
 						<td class="angka"><?=$data['persen']?></td>
 						<td class="angka"><?=$data['laki']?></td>
 						<td class="angka"><?=$data['persen1']?></td>
 						<td class="angka"><?=$data['perempuan']?></td>
 						<td class="angka"><?=$data['persen2']?></td>
 					</tr>
-					<?php $i += $data['jumlah']; ?>
-					<?php $l += $data['laki']; ?>
-					<?php $p += $data['perempuan']; ?>
-				<?php endforeach; ?>
+					<?php $i += $data['jumlah'];?>
+					<?php $l += $data['laki'];?>
+					<?php $p += $data['perempuan'];?>
+				<?php endforeach;?>
 			</tbody>
 		</table>
-		<?php if ($hide == 'lebih'):?>
+		<?php if ($hide=="lebih"):?>
 			<div style='float: left;'>
 				<button class='uibutton special' id='showData'>Selengkapnya...</button>
 			</div>
-		<?php endif; ?>
+		<?php endif;?>
 		<div style="float: right;">
 			<button id='tampilkan' onclick="toggle_tampilkan_<?=$lap?>();" class="uibutton special">Tampilkan Nol</button>
 		</div>

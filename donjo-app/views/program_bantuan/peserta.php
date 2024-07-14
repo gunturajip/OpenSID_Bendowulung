@@ -1,9 +1,9 @@
 <div class="content-wrapper">
-	<?php $detail = $data[0]; ?>
+	<?php $detail = $data[0];?>
 	<section class="content-header">
 		<h1>Profil Penerima Manfaat Program</h1>
 		<ol class="breadcrumb">
-			<li><a href="<?= site_url('beranda')?>"><i class="fa fa-home"></i> Beranda</a></li>
+			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
 			<li><a href="<?= site_url('program_bantuan')?>"> Daftar Program Bantuan</a></li>
 			<li class="active">Profil Penerima Program Bantuan</li>
 		</ol>
@@ -21,12 +21,12 @@
 							<tr>
 								<td width ="20%">Nama Penerima</td>
 								<td width ="1">:</td>
-								<td><?= strtoupper($profil['nama'])?></td>
+								<td><?= strtoupper($profil["nama"])?></td>
 							</tr>
 							<tr>
 								<td>Keterangan</td>
 								<td>:</td>
-								<td><?= $profil['ndesc']?></td>
+								<td><?= $profil["ndesc"]?></td>
 							</tr>
 						</tbody>
 					</table>
@@ -48,9 +48,9 @@
 							<?php foreach ($programkerja as $key => $item): ?>
 								<tr>
 									<td class="padat"><?= ($key + 1); ?></td>
-									<td nowrap><?= fTampilTgl($item['sdate'], $item['edate']); ?></td>
-									<td nowrap><a href="<?= site_url("peserta_bantuan/detail/{$item['id']}")?>"><?= $item['nama'] ?></a></td>
-									<td><?= $item['ndesc']; ?></td>
+									<td nowrap><?= fTampilTgl($item["sdate"],$item["edate"]);?></td>
+									<td nowrap><a href="<?= site_url("program_bantuan/detail/$item[id]")?>"><?= $item["nama"] ?></a></td>
+									<td><?= $item["ndesc"];?></td>
 								</tr>
 							<?php endforeach; ?>
 						</tbody>

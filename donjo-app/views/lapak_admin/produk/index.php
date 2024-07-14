@@ -1,3 +1,52 @@
+<?php
+
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+/*
+ * File ini:
+ *
+ * View untuk Modul Lapak Admin > Produk
+ *
+ *
+ * donjo-app/views/lapak_admin/produk/index.php
+ *
+ */
+
+/**
+ *
+ * File ini bagian dari:
+ *
+ * OpenSID
+ *
+ * Sistem informasi desa sumber terbuka untuk memajukan desa
+ *
+ * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
+ *
+ * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ *
+ * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
+ * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
+ * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
+ * asal tunduk pada syarat berikut:
+ *
+ * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
+ * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
+ * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
+ *
+ * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
+ * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
+ * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
+ *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
+ */
+?>
+
 <div class="content-wrapper">
 	<section class="content-header">
 		<h1>
@@ -5,21 +54,21 @@
 			<small>Daftar Data</small>
 		</h1>
 		<ol class="breadcrumb">
-			<li><a href="<?= site_url('beranda') ?>"><i class="fa fa-home"></i> Beranda</a></li>
+			<li><a href="<?= site_url('hom_sid') ?>"><i class="fa fa-home"></i> Home</a></li>
 			<li class="active">Daftar Data</li>
 		</ol>
 	</section>
 	<section class="content">
-		<?php $this->load->view("{$this->controller}/navigasi", $navigasi); ?>
+		<?php $this->load->view("$this->controller/navigasi", $navigasi); ?>
 		<div id="maincontent"></div>
 		<div class="box box-info">
 			<div class="box-header with-border">
 				<?php if ($this->CI->cek_hak_akses('u')): ?>
-					<a href="<?= site_url("{$this->controller}/produk_form") ?>" class="btn btn-social btn-flat btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Data"><i class="fa fa-plus"></i> Tambah Data
+					<a href="<?= site_url("$this->controller/produk_form") ?>" class="btn btn-social btn-flat btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Data"><i class="fa fa-plus"></i> Tambah Data
 					</a>
 				<?php endif; ?>
 				<?php if ($this->CI->cek_hak_akses('h')): ?>
-					<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url("{$this->controller}/produk_delete_all"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
+					<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url("$this->controller/produk_delete_all"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 				<?php endif; ?>
 			</div>
 			<form id="mainform" name="mainform" method="post">
@@ -90,7 +139,7 @@
 				{ 'className' : 'dt-nowrap', 'targets': [9], 'width': '30%' }
 			],
 			'ajax': {
-				'url': "<?= site_url("{$this->controller}/produk"); ?>",
+				'url': "<?= site_url("$this->controller/produk"); ?>",
 				'method': 'POST',
 				'data': function(d) {
 					d.status= $('#status').val();
@@ -109,20 +158,20 @@
 					'data': function(data) {
 						let status;
 						if (data.status == 1) {
-							status = `<a href="<?= site_url("{$this->controller}/produk_status/") ?>${data.id}/2" class="btn bg-navy btn-flat btn-sm" title="Non Aktifkan Produk"><i class="fa fa-unlock"></i></a>`
+							status = `<a href="<?= site_url("$this->controller/produk_status/") ?>${data.id}/2" class="btn bg-navy btn-flat btn-sm" title="Non Aktifkan Produk"><i class="fa fa-unlock"></i></a>`
 						} else {
-							status = `<a href="<?= site_url("{$this->controller}/produk_status/") ?>${data.id}/1" class="btn bg-navy btn-flat btn-sm" title="Aktifkan Produk"><i class="fa fa-lock"></i></a>`
+							status = `<a href="<?= site_url("$this->controller/produk_status/") ?>${data.id}/1" class="btn bg-navy btn-flat btn-sm" title="Aktifkan Produk"><i class="fa fa-lock"></i></a>`
 						}
 
 						return `
 						<?php if ($this->CI->cek_hak_akses('u')): ?>
-							<a href="<?= site_url("{$this->controller}/produk_form/"); ?>${data.id}" title="Edit Data"  class="btn bg-orange btn-flat btn-sm"><i class="fa fa-edit"></i></a>
+							<a href="<?= site_url("$this->controller/produk_form/"); ?>${data.id}" title="Edit Data"  class="btn bg-orange btn-flat btn-sm"><i class="fa fa-edit"></i></a>
 							${status}
 						<?php endif; ?>
 						<?php if ($this->CI->cek_hak_akses('h')): ?>
-							<a href="#" data-href="<?= site_url("{$this->controller}/produk_delete/"); ?>${data.id}" class="btn bg-maroon btn-flat btn-sm"  title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
+							<a href="#" data-href="<?= site_url("$this->controller/produk_delete/"); ?>${data.id}" class="btn bg-maroon btn-flat btn-sm"  title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 						<?php endif; ?>
-						<a href="<?= site_url("{$this->controller}/produk_detail/"); ?>${data.id}" class="btn bg-blue btn-flat btn-sm" title="Tampilkan" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Detail Produk"><i class="fa fa-eye"></i></a>
+						<a href="<?= site_url("$this->controller/produk_detail/"); ?>${data.id}" class="btn bg-blue btn-flat btn-sm" title="Tampilkan" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Detail Produk"><i class="fa fa-eye"></i></a>
 						`
 					}
 				},

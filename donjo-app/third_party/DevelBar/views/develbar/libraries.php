@@ -1,6 +1,6 @@
-<img src="<?= $icon ?>" title="<?= lang('libraries') ?>"
-     alt="<?= lang('libraries') ?>"/> <?= lang('libraries') . ' (' . count($loaded_libraries) . ')' ?>
-<?php if (count($loaded_libraries) > 0): ?>
+<img src="<?php echo $icon ?>" title="<?php echo lang('libraries') ?>"
+     alt="<?php echo lang('libraries') ?>"/> <?php echo lang('libraries') . ' (' . count($loaded_libraries) . ')' ?>
+<?php if(count($loaded_libraries)): ?>
 <div class="detail">
     <div class="scroll">
     <?php
@@ -10,7 +10,7 @@
                 <span class="left-col"><strong>' . $library . '</strong></span>';
         echo '</p>';
     }
-         ?>
+    ?>
     </div>
 </div>
 <?php endif; ?>

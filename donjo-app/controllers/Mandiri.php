@@ -1,8 +1,18 @@
 <?php
 
+defined('BASEPATH') OR exit('No direct script access allowed');
+
 /*
+ *  File ini:
  *
- * File ini bagian dari:
+ * Controller untuk modul Layanan Mandiri
+ *
+ * donjo-app/controllers/Mandiri.php
+ *
+ */
+
+/*
+ *  File ini bagian dari:
  *
  * OpenSID
  *
@@ -11,7 +21,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,302 +36,140 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 
-use App\Models\Penduduk;
-use App\Models\PendudukHidup;
+class Mandiri extends Admin_Controller {
 
-defined('BASEPATH') || exit('No direct script access allowed');
+	private $_set_page;
+	private $_list_session;
 
-use App\Models\PendudukMandiri;
+	public function __construct()
+	{
+		parent::__construct();
+		$this->load->model('mandiri_model');
 
-class Mandiri extends Admin_Controller
-{
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->library('OTP/OTP_manager', null, 'otp_library');
-        $this->load->library('email');
-        $this->email->initialize(config_email());
-        $this->modul_ini     = 'layanan-mandiri';
-        $this->sub_modul_ini = 'pendaftar-layanan-mandiri';
-        $this->telegram      = new Telegram();
-    }
+		$this->modul_ini = 14;
+		$this->sub_modul_ini = 56;
+		$this->_set_page = ['20', '50', '100'];
+		$this->_list_session = ['cari', 'order_by'];
+	}
 
-    public function index()
-    {
-        return view('admin.layanan_mandiri.daftar.index');
-    }
+	public function clear()
+	{
+		$this->session->unset_userdata($this->_list_session);
+		$this->session->per_page = $this->_set_page[0];
+		$this->session->order_by = 6;
+		redirect('mandiri');
+	}
 
-    public function datatables()
-    {
-        if ($this->input->is_ajax_request()) {
-            return datatables()->of(PendudukMandiri::with('penduduk'))
-                ->addIndexColumn()
-                ->addColumn('aksi', static function ($row): string {
-                    $aksi = '';
-                    if (can('u')) {
-                        $aksi .= '<a href="' . route('mandiri.ajax_pin', $row->id_pend) . '" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Reset PIN Warga" title="Reset PIN Warga" class="btn btn-primary btn-sm"><i class="fa fa-key"></i></a> ';
-                        $aksi .= '<a href="' . route('mandiri.ajax_hp', $row->id_pend) . '" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="' . ($row->telepon ? 'Ubah' : 'Tambah') . ' Telepon Warga" title="' . ($row->telepon ? 'Ubah' : 'Tambah') . ' Telepon" class="btn btn-sm ' . ($row->telepon ? 'bg-teal' : 'bg-green') . '"><i class="fa fa-phone"></i></a> ';
+	public function index($p = 1)
+	{
+		foreach ($this->_list_session as $list)
+		{
+				$data[$list] = $this->session->$list ?: '';
+		}
 
-                        if (! $row->aktif) {
-                            $aksi .= '<a href="' . route('mandiri.ajax_verifikasi_warga', $row->id_pend) . '" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Verifikasi Pendaftaran Warga" title="Verifikasi Pendaftaran Warga" class="btn bg-purple btn-sm"><i class="fa fa-eye"></i></a> ';
-                        }
-                    }
+		$per_page = $this->input->post('per_page');
+		if (isset($per_page))
+			$this->session->per_page = $per_page;
 
-                    if (can('h')) {
-                        $aksi .= '<a href="#" data-href="' . route('mandiri.delete', $row->id_pend) . '" class="btn bg-maroon btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a> ';
-                    }
+		$data['func'] = 'index';
+		$data['set_page'] = $this->_set_page;
+		$data['paging'] = $this->mandiri_model->paging($p);
+		$data['main'] = $this->mandiri_model->list_data($data['order_by'], $data['paging']->offset, $data['paging']->per_page);
+		$data['keyword'] = $this->mandiri_model->autocomplete();
 
-                    return $aksi;
-                })
-                ->editColumn('tanggal_buat', static fn ($row) => tgl_indo2($row->getRawOriginal('tanggal_buat')))
-                ->editColumn('last_login', static fn ($row) => tgl_indo2($row->getRawOriginal('last_login')))
-                ->rawColumns(['aksi'])
-                ->make();
-        }
+		$this->render('mandiri/mandiri', $data);
+	}
 
-        return show_404();
-    }
+	public function filter($filter = '', $order_by = '')
+	{
+		$value = $order_by ?: $this->input->post($filter);
+		if ($value != '')
+			$this->session->$filter = $value;
+		else $this->session->unset_userdata($filter);
+		redirect('mandiri');
+	}
 
-    public function ajax_pin($id_pend = '')
-    {
-        $this->redirect_hak_akses('u');
-        $data['penduduk'] = PendudukHidup::select(['id', 'nik', 'nama'])->whereDoesntHave('mandiri')->get()->toArray();
+	public function ajax_pin($id_pend = '')
+	{
+		$this->redirect_hak_akses('u', $_SERVER['HTTP_REFERER']);
+		$data['penduduk'] = $this->mandiri_model->list_penduduk();
+		if ($id_pend)
+		{
+			$data['id_pend'] = $id_pend;
+			$data['form_action'] = site_url("mandiri/update/$id_pend");
+		}
+		else
+		{
+			$data['id_pend'] = NULL;
+			$data['form_action'] = site_url("mandiri/insert");
+		}
+		$this->load->view('mandiri/ajax_pin', $data);
+	}
 
-        if ($id_pend) {
-            $cek                 = PendudukHidup::find($id_pend)->toArray() ?? show_404();
-            $data['id_pend']     = $cek['id'];
-            $data['form_action'] = route("{$this->controller}.update", $id_pend);
-        } else {
-            $data['id_pend']     = null;
-            $data['form_action'] = route("{$this->controller}.insert");
-        }
+	public function ajax_hp($id_pend)
+	{
+		$this->redirect_hak_akses('u', $_SERVER['HTTP_REFERER']);
+		$data['form_action'] = site_url("mandiri/ubah_hp/$id_pend");
+		$data['penduduk'] = $this->mandiri_model->get_penduduk($id_pend);
+		$this->load->view('mandiri/ajax_hp', $data);
+	}
 
-        $data['tgl_verifikasi_telegram'] = $this->otp_library->driver('telegram')->cek_verifikasi_otp($data['id_pend']);
-        $data['tgl_verifikasi_email']    = $this->otp_library->driver('email')->cek_verifikasi_otp($data['id_pend']);
+	public function ubah_hp($id_pend)
+	{
+		$this->redirect_hak_akses('u', $_SERVER['HTTP_REFERER']);
+		$outp = $this->db->where('id', $id_pend)
+			->set('telepon', bilangan($this->input->post('telepon')))
+			->update('tweb_penduduk');
+		status_sukses($outp);
+		redirect('mandiri');
+	}
 
-        return view('admin.layanan_mandiri.daftar.ajax_pin', $data);
-    }
+	public function insert()
+	{
+		$this->redirect_hak_akses('u', $_SERVER['HTTP_REFERER']);
+		$this->mandiri_model->insert();
+		redirect('mandiri');
+	}
 
-    public function ajax_hp($id_pend)
-    {
-        $this->redirect_hak_akses('u');
-        $data['form_action'] = route("{$this->controller}.ubah_hp", $id_pend);
-        $data['penduduk']    = PendudukHidup::select(['id', 'nik', 'nama', 'telepon'])->find($id_pend)->toArray() ?? show_404();
+	public function update($id_pend)
+	{
+		$this->redirect_hak_akses('u', $_SERVER['HTTP_REFERER']);
+		$this->mandiri_model->update($id_pend);
+		redirect('mandiri');
+	}
 
-        return view('admin.layanan_mandiri.daftar.ajax_hp', $data);
-    }
+	public function delete($id = '')
+	{
+		$this->redirect_hak_akses('h', $_SERVER['HTTP_REFERER']);
+		$this->mandiri_model->delete($id);
+		redirect('mandiri');
+	}
 
-    public function ajax_verifikasi_warga($id_pend)
-    {
-        $this->redirect_hak_akses('u');
-        $data['tgl_verifikasi_telegram'] = $this->otp_library->driver('telegram')->cek_verifikasi_otp($id_pend);
-        $data['tgl_verifikasi_email']    = $this->otp_library->driver('email')->cek_verifikasi_otp($id_pend);
-        $data['form_action']             = route("{$this->controller}.verifikasi_warga", $id_pend);
-        $data['penduduk']                = PendudukMandiri::where(['id_pend' => $id_pend])->join('penduduk_hidup', 'penduduk_hidup.id', '=', 'tweb_penduduk_mandiri.id_pend')->first()->toArray();
+	public function kirim($id_pend = '')
+	{
+		$this->redirect_hak_akses('u', $_SERVER['HTTP_REFERER']);
+		$pin = $this->input->post('pin');
+		$data = $this->mandiri_model->get_mandiri($id_pend);
+		$desa = $this->header['desa'];
 
-        return view('admin.layanan_mandiri.daftar.ajax_verifikasi_warga', $data);
-    }
+		if (cek_koneksi_internet() && $data['telepon'])
+		{
+			$no_tujuan = "+62" . substr($data['telepon'], 1);
 
-    public function verifikasi_warga($id_pend): void
-    {
-        $this->redirect_hak_akses('u');
+			$pesan = "Selamat Datang di Layanan Mandiri Desa " . $desa[nama_desa] . " %0A%0AUntuk Menggunakan Layanan Mandiri, silahkan kunjungi " . site_url('layanan-mandiri') . "%0AAkses Layanan Mandiri : %0A- NIK : " . sensor_nik_kk($data[nik]) . " %0A- PIN : " . $pin . "%0A%0AHarap merahasiakan NIK dan PIN untuk keamanan data anda.%0A%0AHormat kami %0AKepala Desa " . $desa[nama_desa] . "%0A%0A%0A" . $desa[nama_kepala_desa];
 
-        $this->input->post();
-        $pilihan_kirim = $this->request['pilihan_kirim'];
-        // TODO: Sederhanakan query ini, pindahkan ke model
-        $data = Penduduk::select(['telegram', 'email', 'nama'])->find($id_pend);
+			redirect("https://api.whatsapp.com/send?phone=$no_tujuan&text=$pesan");
+		}
 
-        switch ($pilihan_kirim) {
-            case 'kirim_telegram':
-                PendudukMandiri::where(['id_pend' => $id_pend])->update(['aktif' => true]);
-                $pesan = [
-                    'chat_id' => $data->telegram,
-                    'text'    => <<<EOD
-                        HALO {$data->nama},
+		redirect('mandiri');
+	}
 
-                        SELAMAT AKUN LAYANAN MANDIRI ANDA SUDAH DIVERIFIKASI DAN TELAH DISETUJUI
-                        SAAT INI ANDA SUDAH DAPAT LOGIN DI FITUR LAYANAN MANDIRI
-
-                        TERIMA KASIH.
-                        EOD,
-                    'parse_mode' => 'Markdown',
-                ];
-                $this->kirimTelegram($pesan);
-                break;
-
-            case 'kirim_email':
-                PendudukMandiri::where(['id_pend' => $id_pend])->update(['aktif' => true]);
-                $this->kirimEmail($data);
-                break;
-
-            default:
-                redirect($this->controller);
-                break;
-        }
-    }
-
-    protected function kirimTelegram($data): void
-    {
-        try {
-            // TODO: Sederhanakan query ini, pindahkan ke model
-            $this->telegram->sendMessage($data);
-        } catch (Exception $e) {
-            log_message('error', $e);
-
-            status_sukses(false);
-            redirect($this->controller);
-        }
-
-        redirect($this->controller);
-    }
-
-    protected function kirimEmail($data)
-    {
-        try {
-            // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
-            $message = view('admin.layanan_mandiri.daftar.email.verifikasi-berhasil', ['nama' => $data->nama], [], true);
-            // log_message('error','email '. $message);
-            $this->email->from($this->email->smtp_user, 'OpenSID')
-                ->to($data->email)
-                ->subject('Verifikasi Akun Layanan Mandiri')
-                ->set_mailtype('html')
-                ->message($message);
-
-            if (! $this->email->send()) {
-                throw new Exception($this->email->print_debugger());
-            }
-        } catch (Exception $e) {
-            log_message('error', $e);
-
-            status_sukses(false);
-            redirect($this->controller);
-        }
-
-        redirect($this->controller);
-    }
-
-    public function ubah_hp($id_pend): void
-    {
-        $this->redirect_hak_akses('u');
-
-        try {
-            Penduduk::where(['id' => $id_pend])->update(['telepon' => bilangan($this->request['telepon'])]);
-            redirect_with('success', 'Data berhasil disimpan');
-        } catch (Exception  $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Data gagal disimpan');
-        }
-    }
-
-    public function insert(): void
-    {
-        $this->redirect_hak_akses('u');
-
-        try {
-            $mandiri = new PendudukMandiri();
-            $pin     = bilangan($this->request['pin'] ?: $mandiri->generate_pin());
-
-            $mandiri->pin     = hash_pin($pin); // Hash PIN
-            $mandiri->id_pend = $this->request['id_pend'];
-            $mandiri->save();
-
-            // Ambil data sementara untuk ditampilkan
-            $flash        = PendudukHidup::find($this->request['id_pend'])->toArray();
-            $flash['pin'] = $pin; // Normal PIN
-            set_session('info', $flash);
-
-            redirect_with('success', 'Data berhasil disimpan');
-        } catch (Exception  $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Data gagal disimpan');
-        }
-    }
-
-    public function update($id_pend): void
-    {
-        akun_demo($id_pend);
-        $this->redirect_hak_akses('u');
-
-        try {
-            $mandiri = PendudukMandiri::find($id_pend) ?? show_404();
-
-            $pin      = bilangan($this->request['pin'] ?? $mandiri->generate_pin());
-            $penduduk = PendudukHidup::select(['nik', 'nama', 'email', 'telepon', 'telegram'])->find($id_pend);
-
-            $pilihan_kirim = $this->request['pilihan_kirim'];
-            $data['pin']   = hash_pin($pin); // Hash PIN
-            $media         = null;
-
-            switch ($pilihan_kirim) {
-                case 'kirim_telegram':
-                    $media             = 'telegram';
-                    $data['ganti_pin'] = 0;
-                    break;
-
-                case 'kirim_email':
-                    $media             = 'email';
-                    $data['ganti_pin'] = 0;
-                    break;
-
-                default:
-                    $data['ganti_pin'] = 1;
-            }
-
-            $mandiri->update($data);
-            $this->kirimPinBaru($media, $pin, $penduduk);
-            $flash        = array_merge($mandiri->toArray(), $penduduk->toArray());
-            $flash['pin'] = $pin;
-            set_session('info', $flash);
-
-            redirect_with('success', 'Data berhasil disimpan');
-        } catch (Exception  $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Data gagal disimpan');
-        }
-    }
-
-    public function delete($id = ''): void
-    {
-        $this->redirect_hak_akses('h');
-        PendudukMandiri::where(['id_pend' => $id])->delete();
-        redirect($this->controller);
-    }
-
-    public function kirim($id_pend = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $pin  = $this->input->post('pin');
-        $data = PendudukMandiri::where(['id_pend' => $id_pend])->join('penduduk_hidup', 'penduduk_hidup.id', '=', 'tweb_penduduk_mandiri.id_pend')->first()->toArray();
-        $desa = $this->header['desa'];
-        if (cek_koneksi_internet() && $data['telepon']) {
-            $no_tujuan = '+62' . substr($data['telepon'], 1);
-
-            $pesan = 'Selamat Datang di Layanan Mandiri ' . ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']) . ' %0A%0AUntuk Menggunakan Layanan Mandiri, silahkan kunjungi ' . site_url('layanan-mandiri') . '%0AAkses Layanan Mandiri : %0A- NIK : ' . sensor_nik_kk($data['nik']) . ' %0A- PIN : ' . $pin . '%0A%0AHarap merahasiakan NIK dan PIN untuk keamanan data anda.%0A%0AHormat kami %0A' . setting('sebutan_kepala_desa') . ' ' . $desa['nama_desa'] . '%0A%0A%0A' . $desa['nama_kepala_desa'];
-
-            redirect("https://api.whatsapp.com/send?phone={$no_tujuan}&text={$pesan}");
-        }
-        redirect($this->controller);
-    }
-
-    private function kirimPinBaru(?string $media, $pin, $penduduk): void
-    {
-        switch($media) {
-            case 'telegram':
-                $this->otp_library->driver('telegram')->kirim_pin_baru($penduduk->telegram, $pin, $penduduk->nama);
-                break;
-
-            case 'email':
-                $this->otp_library->driver('email')->kirim_pin_baru($penduduk->email, $pin, $penduduk->nama);
-                break;
-        }
-    }
 }

@@ -12,7 +12,7 @@
                         <div class="col-sm-9">
                             <select name="tahun" id="tahun" class="form-control select2 input-sm" style="width:100%;">
                                 <option value="1">Semua Tahun</option>
-                                <?php for ($i = date('Y'); $i >= date('Y') - 30; $i--) : ?>
+                                <?php for ($i = date("Y"); $i >= date("Y") - 30; $i--) : ?>
                                     <option value="<?= $i ?>"><?= $i ?></option>
                                 <?php endfor; ?>
                             </select>
@@ -23,8 +23,8 @@
                         <div class="col-sm-9">
                             <select name="penandatangan" id="penandatangan" class="form-control input-sm">
                                 <?php foreach ($pamong as $data) : ?>
-                                    <option value="<?= $data['pamong_id'] ?>" data-jabatan="<?= trim($data['pamong_jabatan']) ?>" <?= selected($data['pamong_id'], $desa['pamong_id']) ?>>
-                                        <?= $data['pamong_nama'] ?> (<?= $data['pamong_jabatan'] ?>)
+                                    <option value="<?= $data['pamong_id'] ?>" data-jabatan="<?= trim($data['jabatan']) ?>" <?= selected($data['pamong_id'], $desa['pamong_id']) ?>>
+                                        <?= $data['nama'] ?> (<?= $data['jabatan'] ?>)
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -32,8 +32,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <?= batal(); ?>
-                    <button type="submit" class="btn btn-social btn-info btn-sm" id="form_download" name="form_download" data-dismiss="modal"><i class='fa fa-check'></i> Unduh</button>
+                    <button type="reset" class="btn btn-social btn-flat btn-danger btn-sm" data-dismiss="modal"><i class='fa fa-sign-out'></i> Tutup</button>
+                    <button type="submit" class="btn btn-social btn-flat btn-info btn-sm" id="form_download" name="form_download" data-dismiss="modal"><i class='fa fa-check'></i> Unduh</button>
                 </div>
             </form>
         </div>

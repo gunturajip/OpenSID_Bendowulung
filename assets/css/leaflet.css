@@ -249,7 +249,7 @@
 	outline: 0;
 	}
 .leaflet-container a {
-	color: #000000;
+	color: #0078A8;
 	}
 .leaflet-container a.leaflet-active {
 	outline: 2px solid orange;
@@ -457,6 +457,7 @@
 
 
 /* popup */
+
 .leaflet-popup {
 	position: absolute;
 	text-align: center;
@@ -465,10 +466,10 @@
 .leaflet-popup-content-wrapper {
 	padding: 1px;
 	text-align: left;
-	border-radius: 5px;
-}
+	border-radius: 12px;
+	}
 .leaflet-popup-content {
-	margin: 5px 10px;
+	margin: 13px 19px;
 	line-height: 1.4;
 	}
 .leaflet-popup-content p {
@@ -506,7 +507,7 @@
 	position: absolute;
 	top: 0;
 	right: 0;
-	padding: 2px 2px 0 0;
+	padding: 4px 4px 0 0;
 	border: none;
 	text-align: center;
 	width: 18px;

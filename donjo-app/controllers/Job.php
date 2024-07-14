@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2021 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,15 +29,11 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2021 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
-
-use App\Libraries\FlxZipArchive;
-use App\Models\LogBackup;
-use App\Models\LogRestoreDesa;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -46,59 +42,64 @@ class Job extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-
-        $this->load->database();
-
-        $this->load->helper(['number', 'file']);
-        $this->load->model(['ekspor_model', 'database_model']);
+        $this->load->helper('file');
+        $this->load->model(['export_model', 'database_model']);
     }
 
-    public function restore($database = null): void
+    public function restore($database = null)
     {
-        /**
-         * Job hanya bisa digunakan jika :
-         * 1. Diakses lewat CLI dan Config demo true
-         * 2. Diakses lewat CLI dan ENV development
-         *
-         * Selain itu akan menampilkan halaman tidak ditemukan.
-         */
-        if (! is_cli() || (! config_item('demo_mode') && ENVIRONMENT === 'production')) {
+        $ip = 'IP : ' . $this->input->ip_address();
+
+        if (! $this->input->is_cli_request()) {
+            // echo 'Skrip ini hanya dapat diakses melalui baris perintah' . PHP_EOL;
+            log_message('error', $ip . ' | Skrip ini hanya dapat diakses melalui baris perintah');
+
             show_404();
         }
 
-        kosongkanFolder(config_item('log_path'));
-        log_message('notice', '>_ Mulai');
+        if (! config_item('demo_mode')) {
+            // echo 'Skrip ini hanya dapat diakses melalui web demo' . PHP_EOL;
+            log_message('error', $ip . ' | Skrip ini hanya dapat diakses melalui web demo');
+        }
 
-        // Kecuali folder
-        $exclude = [
-            'desa/config',
-            'desa/themes',
-        ];
+        delete_files(config_item('log_path'), true);
+        log_message('error', 'Mulai normalkan website demo');
+        log_message('error', 'Hapus folder logs');
 
-        // Kosongkan folder desa
+        // Kosongkan folder desa dan copy isi folder desa-contoh
         foreach (glob('desa/*', GLOB_ONLYDIR) as $folder) {
-            if (! in_array($folder, $exclude)) {
+            if ($folder != 'desa/config') {
                 delete_files(FCPATH . $folder, true);
             }
         }
-
-        // Buat folder desa
-        folder_desa();
+        xcopy('desa-contoh', 'desa', ['config']);
+        log_message('error', 'Normalkan folder desa');
 
         // Proses Restore Database
-        if ($this->ekspor_model->proses_restore($this->cekDB($database ?? 'contoh_data_awal'))) {
+        if ($this->export_model->proses_restore($this->cek_db($database))) {
+            log_message('error', 'Proses Restore Database Berhasil');
+
+            // Proses migrasi database
+            log_message('error', 'Proses Migrasi Database');
             $this->database_model->migrasi_db_cri();
         } else {
             log_message('error', 'Proses Restore Database Gagal');
         }
 
-        log_message('notice', '>_ Selesai');
+        log_message('error', 'Selesai normalkan website demo');
     }
 
-    private function cekDB($filename)
+    private function cek_db($filename = null)
     {
-        $filename = DESAPATH . "/config/{$filename}.sql";
+        if (! $filename) {
+            $filename = FCPATH . 'contoh_data_awal_' . str_replace('.', '', '20' . currentVersion()) . '01.sql';
+        }
 
+        return $this->cek_file($filename);
+    }
+
+    private function cek_file($filename = null)
+    {
         if (file_exists($filename)) {
             return $filename;
         }
@@ -106,71 +107,5 @@ class Job extends CI_Controller
         log_message('error', 'File ' . $filename . ' tidak ditemukan');
 
         return false;
-    }
-
-    public function backup_inkremental($lokasi): void
-    {
-        if (! is_cli()) {
-            return;
-        }
-        /*
-        variable status
-        0 = sedang dalam prosess
-        1 = selesai diproses
-        2 = selesai di download
-        3 = dibatalkan
-        */
-
-        $lokasi      = ($lokasi == 'null') ? null : 'backup_inkremental';
-        $last_backup = LogBackup::latest()->first()->created_at;
-        $last_backup = ($last_backup != null) ? $last_backup->format('Y-m-d') : '1990-01-01';
-        $backup      = LogBackup::create(['permanen' => ($lokasi) ? 1 : 0, 'pid_process' => getmypid()]); // tandai backup sedang berlangsung
-
-        try {
-            $za = new FlxZipArchive();
-
-            $path        = $za->read_dir(DESAPATH, $last_backup, $lokasi);
-            $file_backup = get_file_info($path);
-            $backup->update(['status' => 1, 'ukuran' => byte_format($file_backup['size']), 'path' => $path]); // update backup sudah selesai
-        } catch (Exception $e) {
-            $backup->update(['status' => -1]); // update backup gagal
-            printf($e);
-        }
-    }
-
-    public function restore_desa($id): void
-    {
-        if (! is_cli()) {
-            return;
-        }
-
-        /*
-        variable status
-        0 = sedang dalam prosess
-        1 = selesai diproses
-        2 = selesai di download
-        3 = dibatalkan
-        -1 = gagal restore
-        */
-
-        $restore = LogRestoreDesa::where('id', '=', $id)->first();
-        $restore->update(['pid_process' => getmypid()]);
-
-        try {
-            $zip = new ZipArchive();
-            $res = $zip->open($restore->path);
-            if ($res === true) {
-                // Unzip path
-                $extractpath = DESAPATH . '..';
-
-                // Extract file
-                $zip->extractTo($extractpath);
-                $zip->close();
-                $restore->update(['status' => 1]);
-            }
-        } catch (Exception $e) {
-            $restore->update(['status' => -1]); // update backup gagal
-            printf($e);
-        }
     }
 }

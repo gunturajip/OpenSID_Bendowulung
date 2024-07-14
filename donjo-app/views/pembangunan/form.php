@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * File ini:
@@ -8,9 +8,11 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * View untuk modul Pembangunan
  *
  * donjo-app/views/pembangunan/form.php,
+ *
  */
 
 /**
+ *
  * File ini bagian dari:
  *
  * OpenSID
@@ -35,11 +37,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
  * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
  * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- *
- * @see 	https://github.com/OpenSID/OpenSID
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 ?>
 
@@ -53,10 +56,6 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		<div class="form-group">
 			<label class="control-label" style="text-align:left;">Volume</label>
 			<input maxlength="50" class="form-control input-sm required" name="volume" id="volume" value="<?= $main->volume ?>" type="text" placeholder="Volume Pembangunan" />
-		</div>
-		<div class="form-group">
-			<label class="control-label" style="text-align:left;">Waktu</label>
-			<input maxlength="50" class="form-control number input-sm required" name="waktu" id="waktu" value="<?= $main->waktu ?>" type="text" placeholder="Lamanya pembangunan (bulan)" />
 		</div>
 		<div class="form-group">
 			<label class="control-label" for="sumber_dana">Sumber Dana</label>
@@ -113,14 +112,6 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label" style="text-align:left;">Sifat Proyek</label>
-			<select class="form-control input-sm select2 required" id="sifat_proyek" name="sifat_proyek">
-				<option value="">-- Pilih Sifat Proyek --</option>
-				<option value="BARU" <?php selected($main->sifat_proyek, 'BARU') ?>>BARU</option>
-				<option value="LANJUTAN" <?php selected($main->sifat_proyek, 'LANJUTAN') ?>>LANJUTAN</option>
-			</select>
-		</div>
-		<div class="form-group">
 			<label class="control-label" style="text-align:left;">Pelaksana Kegiatan</label>
 			<input maxlength="50" class="form-control input-sm required" name="pelaksana_kegiatan" id="pelaksana_kegiatan" value="<?= $main->pelaksana_kegiatan ?>" type="text" placeholder="Pelaksana Kegiatan Pembangunan" />
 		</div>
@@ -128,10 +119,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			<label for="jenis_lokasi" class="control-label">Lokasi Pembangunan</label>
 			<div class="row">
 				<div class="btn-group col-sm-12" data-toggle="buttons">
-					<label class="btn btn-info btn-flat btn-sm form-check-label col-sm-6 <?= $main->lokasi ? null : 'active' ?>">
+					<label class="btn btn-info btn-flat btn-sm form-check-label col-sm-6 <?= $main->lokasi ? NULL : 'active' ?>">
 						<input type="radio" name="jenis_lokasi" class="form-check-input" value="1" autocomplete="off" onchange="pilih_lokasi(this.value);"> Pilih Lokasi
 					</label>
-					<label class="btn btn-info btn-flat btn-sm form-check-label col-sm-6 <?= $main->lokasi ? 'active' : null ?>">
+					<label class="btn btn-info btn-flat btn-sm form-check-label col-sm-6 <?= $main->lokasi ? 'active' : NULL ?>">
 						<input type="radio" name="jenis_lokasi" class="form-check-input" value="2" autocomplete="off" onchange="pilih_lokasi(this.value);"> Tulis Manual
 					</label>
 				</div>
@@ -142,7 +133,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 						<select class="form-control input-sm select2 required" id="id_lokasi" name="id_lokasi">
 							<option value="">-- Pilih Lokasi Pembangunan --</option>
 							<?php foreach ($list_lokasi as $key => $item) : ?>
-								<option value="<?= $item['id'] ?>" <?= selected($item['id'], $main->id_lokasi) ?>><?= strtoupper($item['dusun']) ?> <?= empty($item['rw']) ? '' : " - RW  {$item['rw']}" ?> <?= empty($item['rt']) ? '' : " / RT  {$item['rt']}" ?></option>
+								<option value="<?= $item["id"] ?>" <?= selected($item["id"], $main->id_lokasi) ?>><?= strtoupper($item["dusun"]) ?> <?= empty($item['rw']) ? "" : " - RW  {$item["rw"]}" ?> <?= empty($item['rt']) ? "" : " / RT  {$item["rt"]}" ?></option>
 							<?php endforeach; ?>
 						</select>
 				</div>
@@ -204,6 +195,6 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	}
 
 	$(document).ready(function() {
-		pilih_lokasi(<?= null === $main->id_lokasi ? 2 : 1 ?>);
+		pilih_lokasi(<?= is_null($main->id_lokasi) ? 2 : 1 ?>);
 	});
 </script>

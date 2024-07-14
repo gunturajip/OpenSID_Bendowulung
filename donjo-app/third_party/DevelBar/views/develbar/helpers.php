@@ -1,6 +1,6 @@
-<img src="<?= $icon ?>" title="<?= lang('helpers') ?>"
-     alt="<?= lang('helpers') ?>"/> <?= lang('helpers') . ' (' . count($helpers) . ')' ?>
-<?php if (count($helpers) > 0): ?>
+<img src="<?php echo $icon ?>" title="<?php echo lang('helpers') ?>"
+     alt="<?php echo lang('helpers') ?>"/> <?php echo lang('helpers') . ' (' . count($helpers) . ')' ?>
+<?php if(count($helpers)): ?>
 <div class="detail">
     <div class="scroll">
     <?php
@@ -10,7 +10,7 @@
                 <span class="left-col"><strong>' . ucfirst($helper) . '</strong></span>';
         echo '</p>';
     }
-         ?>
+    ?>
     </div>
 </div>
 <?php endif; ?>

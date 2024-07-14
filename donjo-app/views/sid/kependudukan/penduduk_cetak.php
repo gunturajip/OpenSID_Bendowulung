@@ -3,8 +3,12 @@
 <head>
 	<title>Data Penduduk</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link rel="shortcut icon" href="<?= favico_desa() ?>"/>
-	<link href="<?= asset('css/report.css') ?>" rel="stylesheet" type="text/css">
+	<?php if (is_file(LOKASI_LOGO_DESA . "favicon.ico")): ?>
+		<link rel="shortcut icon" href="<?= base_url()?><?= LOKASI_LOGO_DESA?>favicon.ico" />
+	<?php else: ?>
+		<link rel="shortcut icon" href="<?= base_url()?>favicon.ico" />
+	<?php endif; ?>
+	<link href="<?= base_url()?>assets/css/report.css" rel="stylesheet" type="text/css">
 	<!-- TODO: Pindahkan ke external css -->
 	<style>
 		.textx
@@ -28,14 +32,13 @@
 					<h3> <?= $_SESSION['judul_statistik']; ?></h3>
 				</div>
 				<br>
-				<table class="border thick">
+   		 	<table class="border thick">
 					<thead>
 						<tr class="border thick">
 							<th>No</th>
 							<th>No. KK</th>
-							<th>NIK</th>
-							<th>Tag Id Card</th>
 							<th>Nama</th>
+							<th>NIK</th>
 							<th>Alamat</th>
 							<th><?= ucwords($this->setting->sebutan_dusun)?></th>
 							<th>RW</th>
@@ -59,9 +62,8 @@
 						<tr>
 							<td><?= $data['no']?></td>
 							<td><?= $privasi_nik ? sensor_nik_kk($data['no_kk']) : $data['no_kk']?></td>
-							<td><?= $privasi_nik ? sensor_nik_kk($data['nik']) : $data['nik']?></td>
-							<td><?= $data['tag_id_card']?></td>
 							<td><?= strtoupper($data['nama'])?></td>
+							<td><?= $privasi_nik ? sensor_nik_kk($data['nik']) : $data['nik']?></td>
 							<td><?= strtoupper($data['alamat'])?></td>
 							<td><?= strtoupper($data['dusun'])?></td>
 							<td><?= $data['rw']?></td>
@@ -77,14 +79,14 @@
 							<td><?= $data['hubungan']?></td>
 							<td><?= $data['nama_ayah']?></td>
 							<td><?= $data['nama_ibu']?></td>
-							<td><?php if ($data['status'] == 1): ?>Tetap<?php else: ?>Pendatang<?php endif; ?></td>
+							<td><?php if ($data['status']==1): ?>Tetap<?php else: ?>Pendatang<?php endif; ?></td>
 						</tr>
 						<?php endforeach; ?>
 					</tbody>
 				</table>
 			</div>
    		<label>Tanggal cetak : &nbsp; </label>
-			 <?= tgl_indo(date('Y m d'))?>
+			 <?= tgl_indo(date("Y m d"))?>
 		</div>
 	</body>
 </html>

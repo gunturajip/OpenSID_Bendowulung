@@ -2,7 +2,7 @@
 	<section class="content-header">
 		<h1>Laporan Asset Yang Dihapus</h1>
 		<ol class="breadcrumb">
-			<li><a href="<?=site_url('beranda')?>"><i class="fa fa-home"></i> Beranda</a></li>
+			<li><a href="<?=site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
 			<li class="active">Laporan Asset Yang Dihapus</li>
 		</ol>
 	</section>
@@ -147,7 +147,7 @@
 																	</td>
 																	<td>
 																		<div class="btn-group" role="group" aria-label="...">
-																			<a href="<?= site_url('inventaris_jalan/' . $data->id . '/mutasi'); ?>" title="Lihat Data" type="button" class="btn btn-default btn-sm"><i class="fa fa-eye"></i></a>
+																			<a href="<?= site_url('inventaris_jalan/'.$data->id.'/mutasi'); ?>" title="Lihat Data" type="button" class="btn btn-default btn-sm"><i class="fa fa-eye"></i></a>
 																		</div>
 																	</td>
 																</tr>
@@ -235,7 +235,7 @@
 													<div class="col-sm-9">
 														<select name="tahun" id="tahun" class="form-control select2 input-sm" style="width:100%;">
 															<option value="1">Semua Tahun</option>
-															<?php for ($i = date('Y'); $i >= date('Y') - 30; $i--): ?>
+															<?php for ($i=date("Y"); $i>=date("Y")-30; $i--): ?>
 																<option value="<?= $i ?>"><?= $i ?></option>
 															<?php endfor; ?>
 														</select>
@@ -244,11 +244,11 @@
 												<div class="form-group">
 													<label class="col-sm-2 control-label required" style="text-align:left;" for="penandatangan">Penandatangan</label>
 													<div class="col-sm-9">
-														<select name="penandatangan" id="penandatangan" class="form-control input-sm select2">
-															<?php foreach ($pamong as $data): ?>
-																<option value="<?= $data['pamong_id']?>" data-jabatan="<?= trim($data['pamong_jabatan'])?>"
-																	<?= selected($data['jabatan_id'], $kades_id) ?>>
-																	<?= $data['pamong_nama']?>(<?= $data['pamong_jabatan']?>)
+														<select name="penandatangan" id="penandatangan" class="form-control input-sm">
+															<?php foreach ($pamong AS $data): ?>
+																<option value="<?= $data['pamong_id']?>" data-jabatan="<?= trim($data['jabatan'])?>"
+																	<?= (strpos(strtolower($data['jabatan']),'Kepala Desa') !== false) ? 'selected' : '' ?>>
+																	<?= $data['pamong_nama']?>(<?= $data['jabatan']?>)
 																</option>
 															<?php endforeach; ?>
 														</select>
@@ -256,7 +256,7 @@
 												</div>
 											</div>
 											<div class="modal-footer">
-												<button type="reset" class="btn btn-social btn-flat btn-danger btn-sm pull-left" data-dismiss="modal"><i class='fa fa-times'></i> Tutup</button>
+												<button type="reset" class="btn btn-social btn-flat btn-danger btn-sm" data-dismiss="modal"><i class='fa fa-sign-out'></i> Tutup</button>
 												<button type="submit" class="btn btn-social btn-flat btn-info btn-sm" id="form_download" name="form_download" data-dismiss="modal"><i class='fa fa-check'></i> Unduh</button>
 											</div>
 
@@ -278,7 +278,7 @@
 													<div class="col-sm-9">
 														<select name="tahun_pdf" id="tahun_pdf" class="form-control select2 input-sm" style="width:100%;">
 															<option value="1">Semua Tahun</option>
-															<?php for ($i = date('Y'); $i >= date('Y') - 30; $i--): ?>
+															<?php for ($i = date("Y"); $i >= date("Y")-30; $i--): ?>
 																<option value="<?= $i ?>"><?= $i ?></option>
 															<?php endfor; ?>
 														</select>
@@ -287,11 +287,11 @@
 												<div class="form-group">
 													<label class="col-sm-2 control-label required" style="text-align:left;" for="penandatangan_pdf">Penandatangan</label>
 													<div class="col-sm-9">
-														<select name="penandatangan_pdf" id="penandatangan_pdf" class="form-control input-sm select2">
-															<?php foreach ($pamong as $data): ?>
-																<option value="<?= $data['pamong_id']?>" data-jabatan="<?= trim($data['pamong_jabatan'])?>"
-																	<?= selected($data['jabatan_id'], 1) ?>>
-																	<?= $data['pamong_nama']?> (<?= $data['pamong_jabatan']?>)
+														<select name="penandatangan_pdf" id="penandatangan_pdf" class="form-control input-sm">
+															<?php foreach ($pamong AS $data): ?>
+																<option value="<?= $data['pamong_id']?>" data-jabatan="<?= trim($data['jabatan'])?>"
+																	<?= (strpos(strtolower($data['jabatan']),'Kepala Desa') !== false) ? 'selected' : '' ?>>
+																	<?= $data['pamong_nama']?>(<?= $data['jabatan']?>)
 																</option>
 															<?php endforeach; ?>
 														</select>
@@ -299,7 +299,7 @@
 												</div>
 											</div>
 											<div class="modal-footer">
-												<button type="reset" class="btn btn-social btn-flat btn-danger btn-sm pull-left" data-dismiss="modal"><i class='fa fa-times'></i> Tutup</button>
+												<button type="reset" class="btn btn-social btn-flat btn-danger btn-sm" data-dismiss="modal"><i class='fa fa-sign-out'></i> Tutup</button>
 												<button type="submit" class="btn btn-social btn-flat btn-info btn-sm" id="form_cetak" name="form_cetak"  data-dismiss="modal"><i class='fa fa-check'></i> Cetak</button>
 											</div>
 										</form>
@@ -405,14 +405,14 @@
 
 	$("#form_cetak").click(function( event )
 	{
-		var link = '<?= site_url('laporan_inventaris/cetak_mutasi'); ?>'+ '/' + $('#tahun_pdf').val() + '/' + $('#penandatangan_pdf').val();
+		var link = '<?= site_url("laporan_inventaris/cetak_mutasi"); ?>'+ '/' + $('#tahun_pdf').val() + '/' + $('#penandatangan_pdf').val();
 		window.open(link, '_blank');
 		// alert('fell');
   });
 
 	$("#form_download").click(function( event )
 	{
-		var link = '<?= site_url('laporan_inventaris/download_mutasi'); ?>'+ '/' + $('#tahun').val() + '/' + $('#penandatangan').val();
+		var link = '<?= site_url("laporan_inventaris/download_mutasi"); ?>'+ '/' + $('#tahun').val() + '/' + $('#penandatangan').val();
 		window.open(link, '_blank');
 		// alert('fell');
   });

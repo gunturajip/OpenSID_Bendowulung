@@ -1,8 +1,14 @@
-<?php
-
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 /*
+ *  File ini:
  *
- * File ini bagian dari:
+ * Controller untuk modul Pemetaaan
+ *
+ * donjo-app/controllers/Polygon.php
+ *
+ */
+/*
+ *  File ini bagian dari:
  *
  * OpenSID
  *
@@ -11,7 +17,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,227 +32,204 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 
-use App\Models\Polygon as PolygonModel;
-use Illuminate\View\View;
+class Polygon extends Admin_Controller {
 
-defined('BASEPATH') || exit('No direct script access allowed');
+	public function __construct()
+	{
+		parent::__construct();
 
-class Polygon extends Admin_Controller
-{
-    public const POLYGON     = 0;
-    public const SUB_POLYGON = 2;
+		$this->load->model('plan_polygon_model');
+		$this->modul_ini = 9;
+		$this->sub_modul_ini = 8;
+	}
 
-    private $tip    = 5;
-    private $parent = 1;
-    private $tipe   = 0;
+	public function clear()
+	{
+		unset($_SESSION['cari']);
+		unset($_SESSION['filter']);
+		redirect('polygon');
+	}
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->modul_ini     = 'pemetaan';
-        $this->sub_modul_ini = 'pengaturan-peta';
-    }
+	public function index($p = 1, $o = 0)
+	{
+		$data['p'] = $p;
+		$data['o'] = $o;
 
-    public function index()
-    {
-        $data = ['tip' => $this->tip, 'tipe' => $this->input->get('tipe') ?? $this->tipe,  'parent' => $this->input->get('parent') ?? $this->parent, 'parent_jenis' => ''];
-        if ($data['tipe'] == '2') {
-            $data['parent_jenis'] = PolygonModel::find($data['parent'])->nama ?? '';
-        }
-        $data['status'] = [PolygonModel::LOCK => 'Aktif', PolygonModel::UNLOCK => 'Non Aktif'];
+		if (isset($_SESSION['cari']))
+			$data['cari'] = $_SESSION['cari'];
+		else $data['cari'] = '';
 
-        view('admin.peta.polygon.index', $data);
-    }
+		if (isset($_SESSION['filter']))
+			$data['filter'] = $_SESSION['filter'];
+		else $data['filter'] = '';
 
-    public function datatables()
-    {
-        if ($this->input->is_ajax_request()) {
-            $parent = $this->input->get('parent') ?? $this->parent;
+		if (isset($_POST['per_page']))
+			$_SESSION['per_page'] = $_POST['per_page'];
 
-            $tipe = $this->input->get('tipe') ?? $this->tipe;
+		$data['per_page'] = $_SESSION['per_page'];
+		$data['paging'] = $this->plan_polygon_model->paging($p, $o);
+		$data['main'] = $this->plan_polygon_model->list_data($o, $data['paging']->offset, $data['paging']->per_page);
+		$data['keyword'] = $this->plan_polygon_model->autocomplete();
 
-            return datatables()->of(PolygonModel::whereParrent($parent)->whereTipe($tipe))
-                ->addColumn('ceklist', static function ($row) {
-                    if (can('h')) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
-                    }
-                })
-                ->addIndexColumn()
-                ->addColumn('aksi', static function ($row): string {
-                    $aksi = '';
-                    if (can('u')) {
-                        $aksi .= '<a href="' . route('polygon.form', implode('/', [$row->parrent, $row->id])) . '" class="btn btn-warning btn-sm"  title="Ubah"><i class="fa fa-edit"></i></a> ';
-                    }
+		$this->set_minsidebar(1);
+		$data['tip'] = 5;
+		$this->render('polygon/table', $data);
+	}
 
-                    if ($row->parrent_id == self::POLYGON) {
-                        $aksi .= '<a href="' . route('polygon.index') . '?parent=' . $row->id . '&tipe=2' . '" class="btn bg-purple btn-sm"  title="Rincian ' . $row->nama . '" data-title="Rincian ' . $row->nama . '"><i class="fa fa-bars"></i></a> ';
-                    }
+	public function form($p = 1, $o = 0, $id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$data['p'] = $p;
+		$data['o'] = $o;
 
-                    if (can('u')) {
-                        if ($row->parrent_id == self::POLYGON) {
-                            $aksi .= '<a href="' . route('polygon.ajax_add_sub_polygon', $row->id) . '" class="btn bg-olive btn-sm"  title="Tambah Kategori  ' . $row->nama . '" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Tambah Kategori ' . $row->nama . '"><i class="fa fa-plus"></i></a> ';
-                        }
+		if ($id)
+		{
+			$data['polygon'] = $this->plan_polygon_model->get_polygon($id);
+			$data['form_action'] = site_url("polygon/update/$id/$p/$o");
+		}
+		else
+		{
+			$data['polygon'] = NULL;
+			$data['form_action'] = site_url("polygon/insert");
+		}
 
-                        if ($row->enabled == PolygonModel::UNLOCK) {
-                            $aksi .= '<a href="' . route('polygon.polygon_lock', implode('/', [$row->parrent, $row->id])) . '" class="btn bg-navy btn-sm" title="Aktifkan"><i class="fa fa-lock">&nbsp;</i></a> ';
-                        }
+		$this->set_minsidebar(1);
+		$data['tip'] = 5;
+		$this->render('polygon/form', $data);
+	}
 
-                        if ($row->enabled == PolygonModel::LOCK) {
-                            $aksi .= '<a href="' . route('polygon.polygon_unlock', implode('/', [$row->parrent, $row->id])) . '" class="btn bg-navy btn-sm" title="Non Aktifkan"><i class="fa fa-unlock"></i></a> ';
-                        }
-                    }
+	public function sub_polygon($polygon = 1)
+	{
+		$data['subpolygon'] = $this->plan_polygon_model->list_sub_polygon($polygon);
+		$data['polygon'] = $this->plan_polygon_model->get_polygon($polygon);
+		$this->set_minsidebar(1);
+		$data['tip'] = 5;
+		$this->render('polygon/sub_polygon_table', $data);
+	}
 
-                    if (can('h')) {
-                        $aksi .= '<a href="#" data-href="' . route('polygon.delete', implode('/', [$row->parrent, $row->id])) . '" class="btn bg-maroon btn-sm"  title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a> ';
-                    }
+	public function ajax_add_sub_polygon($polygon = 0, $id = 0)
+	{
+		if ($id)
+		{
+			$data['polygon'] = $this->plan_polygon_model->get_polygon($id);
+			$data['form_action'] = site_url("polygon/update_sub_polygon/$polygon/$id");
+		}
+		else
+		{
+			$data['polygon'] = NULL;
+			$data['form_action'] = site_url("polygon/insert_sub_polygon/$polygon");
+		}
 
-                    return $aksi;
-                })
-                ->editColumn('enabled', static fn ($row) => $row->enabled == '1' ? 'Ya' : 'Tidak')
-                ->editColumn('color', static fn ($row) => '<div style="background-color:' . $row->color . '">&nbsp;<div>')
-                ->rawColumns(['aksi', 'ceklist', 'color'])
-                ->make();
-        }
+		$this->load->view("polygon/ajax_add_sub_polygon_form", $data);
+	}
 
-        return show_404();
-    }
+	public function search()
+	{
+		$cari = $this->input->post('cari');
+		if ($cari != '')
+			$_SESSION['cari'] = $cari;
+		else unset($_SESSION['cari']);
+		redirect('polygon');
+	}
 
-    public function form($parent = 1, $id = ''): View
-    {
-        $this->redirect_hak_akses('u');
-        $this->parent = $parent;
+	public function filter()
+	{
+		$filter = $this->input->post('filter');
+		if ($filter != 0)
+			$_SESSION['filter'] = $filter;
+		else unset($_SESSION['filter']);
+		redirect('polygon');
+	}
 
-        if ($id) {
-            $data['aksi']        = 'Ubah';
-            $data['polygon']     = PolygonModel::find($id)->toArray();
-            $data['form_action'] = route('polygon.update', implode('/', [$this->parent, $id]));
-        } else {
-            $data['aksi']        = 'Tambah';
-            $data['polygon']     = null;
-            $data['form_action'] = route('polygon.insert', $this->parent);
-        }
+	public function insert($tip = 1)
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_polygon_model->insert($tip);
+		redirect("polygon/index/$tip");
+	}
 
-        $data['tip'] = $this->tip;
+	public function update($id = '', $p = 1, $o = 0)
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_polygon_model->update($id);
+		redirect("polygon/index/$p/$o");
+	}
 
-        return view('admin.peta.polygon.form', $data);
-    }
+	public function delete($p = 1, $o = 0, $id = '')
+	{
+		$this->redirect_hak_akses('h', "polygon/index/$p/$o");
+		$this->plan_polygon_model->delete($id);
+		redirect("polygon/index/$p/$o");
+	}
 
-    public function ajax_add_sub_polygon(int $parent = 0)
-    {
-        $data['form_action'] = route("polygon.insert.{$parent}");
+	public function delete_all($p = 1, $o = 0)
+	{
+		$this->redirect_hak_akses('h', "polygon/index/$p/$o");
+		$this->plan_polygon_model->delete_all();
+		redirect("polygon/index/$p/$o");
+	}
 
-        return view('admin.peta.polygon.ajax_form', $data);
-    }
+	public function polygon_lock($id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_polygon_model->polygon_lock($id, 1);
+		redirect("polygon/index/$p/$o");
+	}
 
-    public function insert(int $parent): void
-    {
-        $this->redirect_hak_akses('u');
-        $dataInsert            = $this->validasi($this->input->post());
-        $dataInsert['parrent'] = $parent;
-        $tipe                  = $this->tipe($parent);
-        $dataInsert['tipe']    = $tipe;
+	public function polygon_unlock($id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_polygon_model->polygon_lock($id, 2);
+		redirect("polygon/index/$p/$o");
+	}
 
-        try {
-            PolygonModel::create($dataInsert);
-            redirect_with('success', 'Tipe area berhasil disimpan', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe area gagal disimpan', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        }
-    }
+	public function insert_sub_polygon($polygon = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_polygon_model->insert_sub_polygon($polygon);
+		redirect("polygon/sub_polygon/$polygon");
+	}
 
-    public function update($parent, $id): void
-    {
-        $this->redirect_hak_akses('u');
-        $dataUpdate            = $this->validasi($this->input->post());
-        $dataUpdate['parrent'] = $parent;
-        $tipe                  = $this->tipe($parent);
-        $dataUpdate['tipe']    = $tipe;
+	public function update_sub_polygon($polygon = '', $id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_polygon_model->update_sub_polygon($id);
+		redirect("polygon/sub_polygon/$polygon");
+	}
 
-        try {
-            PolygonModel::where(['id' => $id, 'parrent' => $parent])->update($dataUpdate);
-            redirect_with('success', 'Tipe area berhasil disimpan', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe area gagal disimpan', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        }
-    }
+	public function delete_sub_polygon($polygon = '', $id = '')
+	{
+		$this->redirect_hak_akses('h', "polygon/sub_polygon/$polygon");
+		$this->plan_polygon_model->delete_sub_polygon($id);
+		redirect("polygon/sub_polygon/$polygon");
+	}
 
-    public function delete($parent, $id): void
-    {
-        $tipe = $this->tipe($parent);
-        $this->redirect_hak_akses('h', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
+	public function delete_all_sub_polygon($polygon = '')
+	{
+		$this->redirect_hak_akses('h', "polygon/sub_polygon/$polygon");
+		$this->plan_polygon_model->delete_all_sub_polygon();
+		redirect("polygon/sub_polygon/$polygon");
+	}
 
-        try {
-            PolygonModel::whereId($id)->delete();
-            redirect_with('success', 'Tipe area berhasil dihapus', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe area gagal dihapus', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        }
-    }
+	public function polygon_lock_sub_polygon($polygon = '', $id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_polygon_model->polygon_lock($id, 1);
+		redirect("polygon/sub_polygon/$polygon");
+	}
 
-    public function delete_all($parent): void
-    {
-        $tipe = $this->tipe($parent);
-        $this->redirect_hak_akses('h', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-
-        try {
-            PolygonModel::whereIn('id', $this->input->post('id_cb'))->delete();
-            redirect_with('success', 'Tipe area berhasil dihapus', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe area gagal dihapus', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        }
-    }
-
-    public function polygon_lock($parent, $id): void
-    {
-        $this->redirect_hak_akses('u');
-        $tipe = $this->tipe($parent);
-
-        try {
-            PolygonModel::where(['id' => $id])->update(['enabled' => PolygonModel::LOCK]);
-            redirect_with('success', 'Tipe area berhasil dinonaktifkan', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe area gagal dinonaktifkan', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        }
-    }
-
-    public function polygon_unlock($parent, $id): void
-    {
-        $this->redirect_hak_akses('u');
-        $tipe = $this->tipe($parent);
-
-        try {
-            PolygonModel::where(['id' => $id])->update(['enabled' => PolygonModel::UNLOCK]);
-            redirect_with('success', 'Tipe area berhasil diaktifkan', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe area gagal diaktifkan', route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        }
-    }
-
-    private function validasi($post)
-    {
-        $data['nama']  = nomor_surat_keputusan($post['nama']);
-        $data['color'] = warna($post['color']);
-
-        return $data;
-    }
-
-    private function tipe($parent)
-    {
-        return ($parent == 1) ? self::POLYGON : (PolygonModel::find($parent)->tipe == 0 ? self::SUB_POLYGON : self::SUB_POLYGON);
-    }
+	public function polygon_unlock_sub_polygon($polygon = '', $id = '')
+	{
+		$this->redirect_hak_akses('u');
+		$this->plan_polygon_model->polygon_lock($id, 2);
+		redirect("polygon/sub_polygon/$polygon");
+	}
 }

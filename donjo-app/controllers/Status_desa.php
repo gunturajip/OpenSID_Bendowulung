@@ -1,6 +1,17 @@
 <?php
 
-/*
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+/**
+ * File ini:
+ *
+ * Controller status desa di dashboard Admin
+ *
+ * donjo-app/controllers/Status_desa.php
+ *
+ */
+
+/**
  *
  * File ini bagian dari:
  *
@@ -11,7 +22,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -26,146 +37,61 @@
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 
-use App\Models\SettingAplikasi;
+class Status_desa extends Admin_Controller {
 
-defined('BASEPATH') || exit('No direct script access allowed');
+	public function __construct()
+	{
+		parent::__construct();
+		$this->load->library('data_publik');
+		$this->modul_ini = 200;
+		$this->sub_modul_ini = 101;
+	}
 
-class Status_desa extends Admin_Controller
-{
-    public function __construct()
-    {
-        parent::__construct();
-        $this->modul_ini          = 'info-desa';
-        $this->sub_modul_ini      = 'status-desa';
-        $this->header['kategori'] = 'status sdgs';
-    }
+	public function index()
+	{
+		$kode_desa = $this->header['desa']['kode_desa'];
+		$tahun = $this->session->flashdata('tahun') ?? ($this->input->post('tahun') ?? date('Y'));
+		$cache = 'idm_' . $tahun . '_' . $kode_desa;
 
-    public function index()
-    {
-        if (session('navigasi') == 'sdgs') {
-            return $this->sdgs();
-        }
+		$this->data_publik->set_api_url("https://idm.kemendesa.go.id/open/api/desa/rumusan/$kode_desa/$tahun", $cache)
+			->set_interval(7)
+			->set_cache_folder(FCPATH . 'cache');
 
-        return $this->idm();
-    }
+		$idm = $this->data_publik->get_url_content();
+		if ($idm->body->error)
+		{
+			$idm->body->mapData->error_msg = $idm->body->message . ' : <a href="' . $idm->header->url . ' ">' . $idm->header->url . '<br><br> Periksa Kode Desa di Identitas Desa. Masukkan kode lengkap, contoh : 3507012006 <br>';
+		}
 
-    private function idm()
-    {
-        $tahun = session('tahun') ?? ($this->input->post('tahun') ?? (setting('tahun_idm')) ?? date('Y'));
+		$data = [
+			'idm' => $idm->body->mapData,
+			'tahun' => $tahun
+		];
 
-        $data = [
-            'tahun' => (int) $tahun,
-            'idm'   => idm($this->header['desa']['kode_desa'], $tahun),
-        ];
+		$this->render('home/idm', $data);
+	}
 
-        return view('admin.status_desa.idm', $data);
-    }
+	public function perbaharui(int $tahun)
+	{
+		if (cek_koneksi_internet() && $tahun)
+		{
+			$kode_desa = $this->header['desa']['kode_desa'];
+			$cache = 'idm_' . $tahun . '_' . $kode_desa . '.json';
 
-    public function perbarui_idm(int $tahun): void
-    {
-        if (cek_koneksi_internet() && $tahun) {
-            $kode_desa = $this->header['desa']['kode_desa'];
-            $cache     = 'idm_' . $tahun . '_' . $kode_desa . '.json';
+			$this->cache->file->delete($cache);
+			$this->session->set_flashdata('tahun', $tahun);
+			$this->session->success = 1;
+		}
 
-            // Cek server Kemendes sebelum hapus cache
-            try {
-                $client = new GuzzleHttp\Client();
-                $client->get(config_item('api_idm') . "/{$kode_desa}/{$tahun}", [
-                    'headers' => [
-                        'X-Requested-With' => 'XMLHttpRequest',
-                    ],
-                    'verify' => false,
-                ]);
+		redirect('status_desa');
+	}
 
-                $this->cache->file->delete($cache);
-                set_session('tahun', $tahun);
-
-                redirect_with('success', 'Berhasil Perbarui Data');
-            } catch (Exception $e) {
-                log_message('error', $e->getMessage());
-            }
-        }
-
-        redirect_with('error', 'Tidak dapat mengambil data IDM.');
-    }
-
-    public function simpan(int $tahun): void
-    {
-        SettingAplikasi::where('key', 'tahun_idm')->update(['value' => $tahun]);
-        set_session('tahun', $tahun);
-
-        redirect_with('success', 'Berhasil Simpan Data');
-    }
-
-    private function sdgs()
-    {
-        set_session('navigasi', 'sdgs');
-
-        $data = [
-            'sdgs'      => sdgs(),
-            'kode_desa' => $this->header['desa']['kode_desa'],
-        ];
-
-        return view('admin.status_desa.sdgs', $data);
-    }
-
-    public function perbarui_bps()
-    {
-        if ($this->input->is_ajax_request()) {
-            $kode_bps = $this->request['kode_bps'];
-            SettingAplikasi::where('key', 'kode_desa_bps')->update(['value' => $kode_bps]);
-
-            return json([
-                'status' => true,
-            ]);
-        }
-
-        return json([
-            'status'  => false,
-            'message' => 'Akses tidak di ijinkan',
-        ]);
-    }
-
-    public function perbarui_sdgs(): void
-    {
-        set_session('navigasi', 'sdgs');
-
-        if (cek_koneksi_internet()) {
-            $kode_desa = setting('kode_desa_bps');
-            $cache     = 'sdgs_' . $kode_desa . '.json';
-
-            // Cek server Kemendes sebelum hapus cache
-            try {
-                $client = new GuzzleHttp\Client();
-                $client->get(config_item('api_sdgs') . $kode_desa, [
-                    'headers' => [
-                        'X-Requested-With' => 'XMLHttpRequest',
-                    ],
-                    'verify' => false,
-                ]);
-
-                $this->cache->file->delete($cache);
-
-                redirect_with('success', 'Berhasil Perbarui Data');
-            } catch (Exception $e) {
-                log_message('error', $e->getMessage());
-            }
-        }
-
-        redirect_with('error', 'Tidak dapat mengambil data SDGS.');
-    }
-
-    public function navigasi($navigasi = 'idm'): void
-    {
-        redirect_with('navigasi', $navigasi);
-    }
 }

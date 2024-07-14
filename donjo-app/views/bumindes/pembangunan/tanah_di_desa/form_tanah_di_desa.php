@@ -1,16 +1,18 @@
 <?php
 
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
+/**
  * File ini:
  *
  * View untuk modul Buku Administrasi Desa > Administrasi Pembangunan > Buku Tanah Desa
  *
  * donjo-app/views/bumindes/pembangunan/tanah_di_desa/form_tanah_di_desa.php,
+ *
  */
 
-/*
+/**
+ *
  * File ini bagian dari:
  *
  * OpenSID
@@ -35,11 +37,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @copyright	  Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	  Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- *
- * @see 	https://github.com/OpenSID/OpenSID
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 ?>
 
@@ -48,9 +51,9 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		<div class="col-md-12">
 			<div class="box box-info">
 				<div class="box-header with-border">
-					<a href="<?= site_url('bumindes_tanah_desa') ?>"
+					<a href="<?= site_url() ?>bumindes_tanah_desa"
 						class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i
-							class="fa fa-arrow-circle-left"></i> Kembali Ke Daftar Buku Tanah di <?=ucwords($this->setting->sebutan_desa)?></a>
+							class="fa fa-arrow-circle-left"></i> Kembali Ke Daftar Buku Tanah di Desa</a>
 				</div>
 				<div class="box-body">
 					<div class="row">
@@ -63,7 +66,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 									<label class="btn btn-info btn-flat btn-sm col-sm-3 form-check-label">
 										<input type="radio" name="jenis_pemilik" class="form-check-input" value="1"
 											autocomplete="off"
-											<?php selected((empty($main) || $main->jenis_pemilik == 1), true, true)?>
+											<?php selected((empty($main) or $main->jenis_pemilik == 1), true, true)?>
 											onchange="pilih_pemilik(this.value);">Warga Desa
 									</label>
 									<label class="btn btn-info btn-flat btn-sm col-sm-3 form-check-label">
@@ -81,7 +84,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 										name="penduduk">
 										<option value="">-- Silakan Masukan Nama / NIK --</option>
 										<?php foreach ($penduduk as $item): ?>
-										<option value="<?= $item['id']?>" <?php selected($item['id'], $item['nama']) ?>><?= $item['nama'] . ' [ NIK ' . $item['nik'] . ' ]'?></option>
+										<option value="<?= $item['id']?>" <?php selected($item['id'], $item['nama']) ?>><?= $item['nama']." [ NIK ".$item['nik']." ]"?></option>
 										<?php endforeach ?>
 									</select>
 								</div>
@@ -96,7 +99,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<div class="form-group" id="nik_penduduk">
 								<label class="col-sm-3 control-label" style="text-align:left;" for="nik">NIK Penduduk</label>
 								<div class="col-sm-8">
-									<input class="form-control input-sm nik required" type="text" placeholder="NIK Penduduk" value="<?= $main->nik_penduduk ?: $main->nik ?>" name="nik" id="nik" />
+									<input class="form-control input-sm nik required" maxlength="16"  min="0" type="text" placeholder="0" value="<?= $main->nik_penduduk ?: $main->nik ?>" name="nik" id="nik" />
 								</div>
 							</div>
 							<div class="form-group">
@@ -464,13 +467,14 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			$("#lain_lain").attr("disabled", true);
 			$("#mutasi").attr("disabled", true);
 			$("#keterangan").attr("disabled", true);
+			$('#nik_penduduk').hide();
 			$('#pilihan_penduduk').hide();
 			$('#pilihan_pemilik').hide();
 			$('#form_footer').hide();
 		}
 		else
 		{
-			pilih_pemilik('<?= $main->jenis_pemilik ?? 1 ?>');
+			pilih_pemilik((<?=$main->jenis_pemilik? : 1?> ))
 		}
 	});
 
@@ -482,10 +486,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			$('#penduduk').val($('#id_penduduk').val());
 			$('#penduduk').addClass('required');
 			$('#pemilik_asal').val('');
-			$('#nik').val('');
+			$('#nik').val('0');
 			$('#pemilik_asal').removeClass('required');
-			$('#nik').removeClass('required');
-			$('#nik').removeClass('nik');
 			$('#nama_penduduk').hide();
 			$('#nik_penduduk').hide();
 			$('#pilihan_penduduk').show();
@@ -494,8 +496,6 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		{
 			$('#penduduk').val('');
 			$('#pemilik_asal').addClass('required');
-			$('#nik').addClass('required');
-			$('#nik').addClass('nik');
 			$('#penduduk').removeClass('required');
 			$('#nama_penduduk').show();
 			$('#nik_penduduk').show();

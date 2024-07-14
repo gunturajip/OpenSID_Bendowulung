@@ -1,17 +1,17 @@
 <?php
-    $tgl = date('d_m_Y');
+	$tgl =  date('d_m_Y');
 
-    header('Content-type: application/octet-stream');
-    header("Content-Disposition: attachment; filename=subjek_analisis_{$tgl}.xls");
-    header('Pragma: no-cache');
-    header('Expires: 0');
-    ?>
+	header("Content-type: application/octet-stream");
+	header("Content-Disposition: attachment; filename=subjek_analisis_$tgl.xls");
+	header("Pragma: no-cache");
+	header("Expires: 0");
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>Data Subjek Analisis</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link href="<?= asset('css/report.css') ?>" rel="stylesheet" type="text/css">
+		<link href="<?= base_url()?>assets/css/report.css" rel="stylesheet" type="text/css">
 		<!-- TODO: Pindahkan ke external css -->
 		<style>
 			td
@@ -61,7 +61,7 @@
 				</tbody>
 			</table>
 			</div>
-			<label>Tanggal cetak : &nbsp; </label><?= tgl_indo(date('Y m d'))?>
+			<label>Tanggal cetak : &nbsp; </label><?= tgl_indo(date("Y m d"))?>
 		</div>
 	</body>
 </html>

@@ -3,7 +3,7 @@
 	<head>
 		<title>Data Analisis</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link href="<?= asset('css/report.css') ?>" rel="stylesheet" type="text/css">
+		<link href="<?= base_url()?>assets/css/report.css" rel="stylesheet" type="text/css">
 		<!-- TODO: Pindahkan ke external css -->
 		<style>
 			td
@@ -69,7 +69,7 @@
 					</tbody>
 				</table>
 			</div>
- 			<label>Tanggal cetak : &nbsp; </label><?= tgl_indo(date('Y m d'))?>
+ 			<label>Tanggal cetak : &nbsp; </label><?= tgl_indo(date("Y m d"))?>
 		</div>
 	</body>
 </html>

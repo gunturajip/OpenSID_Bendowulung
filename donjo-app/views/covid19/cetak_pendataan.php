@@ -3,7 +3,7 @@
 	<head>
 		<title>Data Pemudik Saat Pandemi Covid-19</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link href="<?= asset('css/report.css') ?>" rel="stylesheet" type="text/css">
+		<link href="<?= base_url()?>assets/css/report.css" rel="stylesheet" type="text/css">
 		<style type="text/css">
 			.textx
 			{
@@ -18,12 +18,12 @@
 					<tr>
 						<td align="center">
 							<?php if ($aksi != 'unduh'): ?>
-								<img src="<?= gambar_desa($config['logo']); ?>" alt="" style="width:100px; height:auto">
+								<img src="<?= gambar_desa($config['logo']);?>" alt="" style="width:100px; height:auto">
 							<?php endif; ?>
 							<h1>PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten)?> <?= strtoupper($config['nama_kabupaten'])?> </h1>
 							<h1 style="text-transform: uppercase;"></h1>
 							<h1><?= strtoupper($this->setting->sebutan_kecamatan)?> <?= strtoupper($config['nama_kecamatan'])?> </h1>
-							<h1><?= strtoupper($this->setting->sebutan_desa) . ' ' . strtoupper($config['nama_desa'])?></h1>
+							<h1><?= strtoupper($this->setting->sebutan_desa)." ".strtoupper($config['nama_desa'])?></h1>
 						</td>
 					</tr>
 					<tr>
@@ -53,7 +53,6 @@
 										<th>Tanggal Lahir</th>
 										<th>Jenis Kelamin</th>
 										<th>Alamat</th>
-										<th>Pantau Warga</th>
 										<th>Asal Pemudik</th>
 										<th>Tiba Tanggal</th>
 										<th>Tujuan Mudik</th>
@@ -67,30 +66,27 @@
 									</tr>
 								</thead>
 								<tbody>
-									<?php	$i = 1;
-
-		foreach ($pemudik_list as $item): ?>
+									<?php	$i=1;	foreach ($pemudik_list as $key=>$item): ?>
 										<tr>
 											<td><?= $i?></td>
-											<td class='textx'><?= $item['terdata_nama']?></td>
-											<td><?= $item['terdata_info']?></td>
-											<td><?= $item['tempat_lahir'] ?></td>
-											<td><?= $item['tanggal_lahir'] ?></td>
-											<td><?= $item['sex'] ?></td>
-											<td><?= $item['info']?></td>
-											<td>Warga <?= $item['pantau'] == 1 ? 'Pemudik' : ucwords($this->setting->sebutan_desa) ?></td>
-											<td><?= $item['asal_mudik']?></td>
-											<td><?= $item['tanggal_datang']?></td>
-											<td><?= $item['tujuan_mudik']?></td>
-											<td><?= $item['durasi_mudik']?></td>
-											<td><?= $item['no_hp']?></td>
-											<td><?= $item['email']?></td>
-											<td><?= $item['status_covid']?></td>
-											<td><?= $item['keluhan_kesehatan']?></td>
-											<td><?= $item['keterangan']?></td>
-											<td><?= ($item['is_wajib_pantau'] === '1' ? 'Ya' : 'Tidak'); ?></td>
+											<td class='textx'><?= $item["terdata_nama"]?></td>
+											<td><?= $item["terdata_info"]?></td>
+											<td><?= $item["tempat_lahir"] ?></td>
+											<td><?= $item["tanggal_lahir"] ?></td>
+											<td><?= $item["sex"] ?></td>
+											<td><?= $item["info"]?></td>
+											<td><?= $item["asal_mudik"]?></td>
+											<td><?= $item["tanggal_datang"]?></td>
+											<td><?= $item["tujuan_mudik"]?></td>
+											<td><?= $item["durasi_mudik"]?></td>
+											<td><?= $item["no_hp"]?></td>
+											<td><?= $item["email"]?></td>
+											<td><?= $item["status_covid"]?></td>
+											<td><?= $item["keluhan_kesehatan"]?></td>
+											<td><?= $item["keterangan"]?></td>
+											<td><?= ($item["is_wajib_pantau"] === '1' ? "Ya" : "Tidak"); ?></td>
 										</tr>
-									<?php $i++; endforeach; ?>
+									<?php $i++;	endforeach;	?>
 								</tbody>
 							</table>
 						</td>

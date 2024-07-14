@@ -1,16 +1,18 @@
 <?php
 
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
+/**
  * File ini:
  *
  * View untuk modul Statistik Kependudukan
  *
  * donjo-app/views/statistik/ajax_rentang_form.php,
+ *
  */
 
-/*
+/**
+ *
  * File ini bagian dari:
  *
  * OpenSID
@@ -35,17 +37,18 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @copyright	  Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	  Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- *
- * @see 	https://github.com/OpenSID/OpenSID
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 ?>
 
-<script src="<?= asset('js/jquery.validate.min.js')?>"></script>
-<script src="<?= asset('js/validasi.js')?>"></script>
-<script src="<?= asset('js/localization/messages_id.js')?>"></script>
+<script src="<?= base_url('assets/js/jquery.validate.min.js')?>"></script>
+<script src="<?= base_url('assets/js/validasi.js')?>"></script>
+<script src="<?= base_url('assets/js/localization/messages_id.js')?>"></script>
 <form action="<?= $form_action?>" method="post" id="validasi">
 	<div class='modal-body'>
 		<div class="form-group">
@@ -63,55 +66,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</div>
 	</div>
 	<div class="modal-footer">
-		<?= batal() ?>
-		<button type="submit" class="btn btn-social btn-info btn-sm" id="ok"><i class='fa fa-check'></i> Simpan</button>
+		<button type="reset" class="btn btn-social btn-flat btn-danger btn-sm" data-dismiss="modal"><i class='fa fa-sign-out'></i> Tutup</button>
+		<button type="submit" class="btn btn-social btn-flat btn-info btn-sm" id="ok"><i class='fa fa-check'></i> Simpan</button>
 	</div>
 </form>
-
-<script>
-
-	// dokument ready
-	$(document).ready(function() {
-		function validateMin() {
-			var min = parseFloat($('#dari').val());
-			var max = parseFloat($('#sampai').val());
-
-			if (min >= max) {
-				$('#dari').prop('max', max);
-			} else {
-				$('#dari').prop('max', '');
-				$('#sampai').prop('min', '');
-			}
-		}
-
-		function validateMax() {
-			var min = parseFloat($('#dari').val());
-			var max = parseFloat($('#sampai').val());
-
-			if (max < min) {
-				$('#sampai').prop('min', min);
-			} else {
-				$('#sampai').prop('min', '');
-				$('#dari').prop('max', '');
-			}
-		}
-
-		$('#dari').on('keyup', function() {
-			validateMin();
-		});
-
-		$('#sampai').on('keyup', function() {
-			validateMax();
-		});
-
-		$('#validasi').submit(function(e) {
-			var min = parseFloat($('#dari').val());
-			var max = parseFloat($('#sampai').val());
-
-			if (min >= max) {
-				e.preventDefault();
-			}
-		});
-	});
-</script>
-

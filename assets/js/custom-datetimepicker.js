@@ -109,16 +109,10 @@ $(document).ready(function()
 		format: 'DD-MM-YYYY',
 		locale:'id'
 	});
-	$('.tgl_sekarang').datetimepicker(
+	$('#tgl_6').datetimepicker(
 	{
-		format: 'DD-MM-YYYY',
-		locale:'id',
-		maxDate: moment(new Date())
-	});
-	$('.jam').datetimepicker(
-	{
-		format: 'HH:mm:ss',
-		locale:'id'
+			format: 'DD-MM-YYYY',
+			locale:'id'
 	});
 	$('#jam_1').datetimepicker(
 	{
@@ -152,29 +146,5 @@ $(document).ready(function()
 		format: 'HH:mm',
 		locale:'id'
 	});
-	$('#tanggal_cetak_ktp').datetimepicker(
-	{
-		format: 'DD-MM-YYYY',
-		locale:'id',
-		maxDate: new(Date)
-	});
-	$('#surat_tgl_mulai').datetimepicker({
-		locale: 'id',
-		format: 'DD-MM-YYYY',
-		useCurrent: false,
-		defaultDate: moment(new Date())
-	});
-	$('#surat_tgl_akhir').datetimepicker({
-		locale: 'id',
-		format: 'DD-MM-YYYY',
-		useCurrent: false,
-		minDate: moment(new Date()).add($('#surat_tgl_akhir').data('masa-berlaku'), $('#surat_tgl_akhir').data('satuan-masa-berlaku')),
-		defaultDate: moment(new Date()).add($('#surat_tgl_akhir').data('masa-berlaku'), $('#surat_tgl_akhir').data('satuan-masa-berlaku'))
-	});
-	$('#surat_tgl_mulai').datetimepicker().on('dp.change', function(e) {
-		var startDate = moment(e.date);
-		var endDate = startDate.clone().add($('#surat_tgl_mulai').data('masa-berlaku'), $('#surat_tgl_mulai').data('satuan-masa-berlaku'));
-		$('#surat_tgl_akhir').datetimepicker('minDate', endDate);
-		$('#surat_tgl_akhir').datetimepicker('date', endDate);
-	});
+
 });

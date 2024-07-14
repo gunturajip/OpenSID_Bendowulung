@@ -1,16 +1,18 @@
 <?php
 
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
+/**
  * File ini:
  *
  * View untuk modul Buku Administrasi Desa > Buku Rekapitulasi Jumlah Penduduk
  *
  * donjo-app/views/bumindes/penduduk/rekapitulasi/content_rekapitulasi.php,
+ *
  */
 
-/*
+/**
+ *
  * File ini bagian dari:
  *
  * OpenSID
@@ -35,11 +37,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
  * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
  *
- * @copyright	  Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	  Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @package	OpenSID
+ * @author	Tim Pengembang OpenDesa
+ * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- *
- * @see 	https://github.com/OpenSID/OpenSID
+ * @link 	https://github.com/OpenSID/OpenSID
  */
 ?>
 
@@ -49,7 +52,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			source: function( request, response ) {
 				$.ajax( {
 					type: "POST",
-					url: '<?= site_url('bumindes_penduduk_rekapitulasi/autocomplete'); ?>',
+					url: '<?= site_url("bumindes_penduduk_rekapitulasi/autocomplete"); ?>',
 					dataType: "json",
 					data: {
 						cari: request.term
@@ -63,25 +66,24 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		} );
 	} );
 </script>
-<?php if (data_lengkap()): ?>
+<?php if ($tgl_lengkap && $tgl_lengkap_aktif == 1): ?>
 <div class="box box-info">
 	<div class="box-header with-border">
-		<a href="<?= site_url($this->controller . '/ajax_cetak/cetak'); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Buku Rekapitulasi Penduduk Desa" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Buku Rekapitulasi Penduduk Desa"><i class="fa fa-print "></i> Cetak</a>
-		<a href="<?= site_url($this->controller . '/ajax_cetak/unduh'); ?>" title="Unduh Buku Rekapitulasi Penduduk Desa" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Buku Rekapitulasi Penduduk Desa"><i class="fa fa-download"></i> Unduh</a>
-		<a href="<?= site_url($this->controller . '/ajax_cetak/pdf'); ?>" title="Laporan PDF Buku Rekapitulasi Penduduk Desa" class="btn btn-social btn-flat bg-green btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Laporan PDF Buku Rekapitulasi Penduduk Desa"><i class="fa fa-file-pdf-o"></i> Laporan PDF</a>
-		<a href="<?= site_url($this->controller . '/clear') ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+		<a href="<?= site_url($this->controller."/ajax_cetak/cetak"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Buku Rekapitulasi Penduduk Desa" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Buku Rekapitulasi Penduduk Desa"><i class="fa fa-print "></i> Cetak</a>
+		<a href="<?= site_url($this->controller."/ajax_cetak/unduh"); ?>?>" title="Unduh Buku Rekapitulasi Penduduk Desa" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh Buku Mutasi Penduduk Desa" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Buku Rekapitulasi Penduduk Desa"><i class="fa fa-download"></i> Unduh</a>
+		<a href="<?= site_url($this->controller."/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
 	</div>
 	<div class="box-body">
 		<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 			<form id="mainform" name="mainform" action="" method="post">
 				<div class="row">
 					<div class="col-sm-9">
-						<select class="form-control input-sm " name="filter_tahun" onchange="formAction('mainform','<?= site_url($this->controller . '/filter/filter_tahun')?>')">
-							<?php for ($t = $tahun_lengkap; $t <= date('Y'); $t++): ?>
-								<option value=<?= $t ?> <?php selected($tahun, $t); ?>><?= $t ?></option>
-							<?php endfor; ?>
+						<select class="form-control input-sm " name="filter_tahun" onchange="formAction('mainform','<?= site_url($this->controller.'/filter/filter_tahun')?>')">
+							<?php for ($t=$tahun_lengkap; $t<=date("Y"); $t++): ?>
+              	<option value=<?= $t ?> <?php selected($tahun, $t); ?>><?= $t ?></option>
+              <?php endfor; ?>
 						</select>
-						<select class="form-control input-sm" name="filter_bulan" onchange="formAction('mainform','<?= site_url($this->controller . '/filter/filter_bulan')?>')" width="100%">
+						<select class="form-control input-sm" name="filter_bulan" onchange="formAction('mainform','<?= site_url($this->controller.'/filter/filter_bulan')?>')" width="100%">
 							<?php foreach (bulan() as $idx => $nama_bulan): ?>
 								<option value="<?= $idx?>" <?php selected($bulan, $idx); ?>><?= $nama_bulan?></option>
 							<?php endforeach; ?>
@@ -89,9 +91,9 @@ defined('BASEPATH') || exit('No direct script access allowed');
 					</div>
 					<div class="col-sm-3">
 						<div class="input-group input-group-sm pull-right">
-							<input name="cari" id="cari" class="form-control" placeholder="Cari..." type="text" title="Pencarian berdasarkan nama penduduk" value="<?=html_escape($cari); ?>" onkeypress="if (event.keyCode == 13){$('#'+'mainform').attr('action', '<?= site_url('bumindes_penduduk_rekapitulasi/filter/cari'); ?>');$('#'+'mainform').submit();}">
+							<input name="cari" id="cari" class="form-control" placeholder="Cari..." type="text" title="Pencarian berdasarkan nama penduduk" value="<?=html_escape($cari); ?>" onkeypress="if (event.keyCode == 13){$('#'+'mainform').attr('action', '<?= site_url("bumindes_penduduk_rekapitulasi/filter/cari"); ?>');$('#'+'mainform').submit();}">
 							<div class="input-group-btn">
-								<button type="submit" class="btn btn-default" onclick="$('#'+'mainform').attr('action', '<?= site_url('bumindes_penduduk_rekapitulasi/filter/cari'); ?>');$('#'+'mainform').submit();"><i class="fa fa-search"></i></button>
+								<button type="submit" class="btn btn-default" onclick="$('#'+'mainform').attr('action', '<?= site_url("bumindes_penduduk_rekapitulasi/filter/cari"); ?>');$('#'+'mainform').submit();"><i class="fa fa-search"></i></button>
 							</div>
 						</div>
 					</div>
@@ -161,152 +163,50 @@ defined('BASEPATH') || exit('No direct script access allowed');
 								<th>P</th>
 							</tr>
 							<tr class="border thick">
-								<?php for ($i = 1; $i <= 33; $i++): ?>
+								<?php for ($i = 1; $i<=33; $i++): ?>
 									<th><?= $i ?></th>
 								<?php endfor; ?>
 							</tr>
 						</thead>
 						<tbody>
-							<?php if ($main):
-							    $totals = [
-							        'WNA_L_AWAL'          => 0,
-							        'WNA_P_AWAL'          => 0,
-							        'WNI_L_AWAL'          => 0,
-							        'WNI_P_AWAL'          => 0,
-							        'KK_JLH'              => 0,
-							        'KK_ANG_KEL'          => 0,
-							        'WNA_L_TAMBAH_LAHIR'  => 0,
-							        'WNA_P_TAMBAH_LAHIR'  => 0,
-							        'WNI_L_TAMBAH_LAHIR'  => 0,
-							        'WNI_P_TAMBAH_LAHIR'  => 0,
-							        'WNA_L_TAMBAH_MASUK'  => 0,
-							        'WNA_P_TAMBAH_MASUK'  => 0,
-							        'WNI_L_TAMBAH_MASUK'  => 0,
-							        'WNI_P_TAMBAH_MASUK'  => 0,
-							        'WNA_L_KURANG_MATI'   => 0,
-							        'WNA_P_KURANG_MATI'   => 0,
-							        'WNI_L_KURANG_MATI'   => 0,
-							        'WNI_P_KURANG_MATI'   => 0,
-							        'WNA_L_KURANG_KELUAR' => 0,
-							        'WNA_P_KURANG_KELUAR' => 0,
-							        'WNI_L_KURANG_KELUAR' => 0,
-							        'WNI_P_KURANG_KELUAR' => 0,
-							        'WNA_L_AKHIR'         => 0,
-							        'WNA_P_AKHIR'         => 0,
-							        'WNI_L_AKHIR'         => 0,
-							        'WNI_P_AKHIR'         => 0,
-							        'KK_AKHIR_JML'        => 0,
-							        'KK_AKHIR_ANG_KEL'    => 0,
-							    ];
-
-							    foreach ($main as $key => $data):
-							        $data['JLH_JIWA_1'] = $data['KK_JLH'] + $data['KK_ANG_KEL'];
-							        $data['JLH_JIWA_2'] = $data['KK_AKHIR_JML'] + $data['KK_AKHIR_ANG_KEL'];
-
-							        $totals['WNA_L_AWAL'] += (int) ($data['WNA_L_AWAL']);
-							        $totals['WNA_P_AWAL'] += (int) ($data['WNA_P_AWAL']);
-							        $totals['WNI_L_AWAL'] += (int) ($data['WNI_L_AWAL']);
-							        $totals['WNI_P_AWAL'] += (int) ($data['WNI_P_AWAL']);
-							        $totals['KK_JLH'] += (int) ($data['KK_JLH']);
-							        $totals['KK_ANG_KEL'] += (int) ($data['KK_ANG_KEL']);
-							        $totals['JLH_JIWA_1'] += (int) ($data['JLH_JIWA_1']);
-							        $totals['WNA_L_TAMBAH_LAHIR'] += (int) ($data['WNA_L_TAMBAH_LAHIR']);
-							        $totals['WNA_P_TAMBAH_LAHIR'] += (int) ($data['WNA_P_TAMBAH_LAHIR']);
-							        $totals['WNI_L_TAMBAH_LAHIR'] += (int) ($data['WNI_L_TAMBAH_LAHIR']);
-							        $totals['WNI_P_TAMBAH_LAHIR'] += (int) ($data['WNI_P_TAMBAH_LAHIR']);
-							        $totals['WNA_L_TAMBAH_MASUK'] += (int) ($data['WNA_L_TAMBAH_MASUK']);
-							        $totals['WNA_P_TAMBAH_MASUK'] += (int) ($data['WNA_P_TAMBAH_MASUK']);
-							        $totals['WNI_L_TAMBAH_MASUK'] += (int) ($data['WNI_L_TAMBAH_MASUK']);
-							        $totals['WNI_P_TAMBAH_MASUK'] += (int) ($data['WNI_P_TAMBAH_MASUK']);
-							        $totals['WNA_L_KURANG_MATI'] += (int) ($data['WNA_L_KURANG_MATI']);
-							        $totals['WNA_P_KURANG_MATI'] += (int) ($data['WNA_P_KURANG_MATI']);
-							        $totals['WNI_L_KURANG_MATI'] += (int) ($data['WNI_L_KURANG_MATI']);
-							        $totals['WNI_P_KURANG_MATI'] += (int) ($data['WNI_P_KURANG_MATI']);
-							        $totals['WNA_L_KURANG_KELUAR'] += (int) ($data['WNA_L_KURANG_KELUAR']);
-							        $totals['WNA_P_KURANG_KELUAR'] += (int) ($data['WNA_P_KURANG_KELUAR']);
-							        $totals['WNI_L_KURANG_KELUAR'] += (int) ($data['WNI_L_KURANG_KELUAR']);
-							        $totals['WNI_P_KURANG_KELUAR'] += (int) ($data['WNI_P_KURANG_KELUAR']);
-							        $totals['WNA_L_AKHIR'] += (int) ($data['WNA_L_AKHIR']);
-							        $totals['WNA_P_AKHIR'] += (int) ($data['WNA_P_AKHIR']);
-							        $totals['WNI_L_AKHIR'] += (int) ($data['WNI_L_AKHIR']);
-							        $totals['WNI_P_AKHIR'] += (int) ($data['WNI_P_AKHIR']);
-							        $totals['KK_AKHIR_JML'] += (int) ($data['KK_AKHIR_JML']);
-							        $totals['KK_AKHIR_ANG_KEL'] += (int) ($data['KK_AKHIR_ANG_KEL']);
-							        $totals['JLH_JIWA_2'] += (int) ($data['JLH_JIWA_2']);
-							        ?>
+							<?php if ($main): ?>
+								<?php foreach ($main as $key => $data): ?>
 									<tr>
 										<td class="padat"><?= ($key + $paging->offset + 1); ?></td>
 										<td><?= strtoupper($data['DUSUN'])?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_L_AWAL'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_P_AWAL'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_L_AWAL'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_P_AWAL'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['KK_JLH'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['KK_ANG_KEL'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['JLH_JIWA_1'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_L_TAMBAH_LAHIR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_P_TAMBAH_LAHIR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_L_TAMBAH_LAHIR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_P_TAMBAH_LAHIR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_L_TAMBAH_MASUK'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_P_TAMBAH_MASUK'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_L_TAMBAH_MASUK'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_P_TAMBAH_MASUK'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_L_KURANG_MATI'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_P_KURANG_MATI'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_L_KURANG_MATI'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_P_KURANG_MATI'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_L_KURANG_KELUAR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_P_KURANG_KELUAR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_L_KURANG_KELUAR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_P_KURANG_KELUAR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_L_AKHIR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNA_P_AKHIR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_L_AKHIR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['WNI_P_AKHIR'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['KK_AKHIR_JML'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['KK_AKHIR_ANG_KEL'], '-') ?></td>
-										<td class="padat"><?= show_zero_as($data['JLH_JIWA_2'], '-') ?></td>
-										<td class="padat">-</td>
+										<td><?= show_zero_as($data['WNA_L_AWAL'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_P_AWAL'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_L_AWAL'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_P_AWAL'],'-') ?></td>
+										<td><?= show_zero_as($data['KK_JLH'],'-') ?></td>
+										<td><?= show_zero_as($data['KK_ANG_KEL'],'-') ?></td>
+										<td><?= show_zero_as($data['KK_JLH']+$data['KK_ANG_KEL'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_L_TAMBAH_LAHIR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_P_TAMBAH_LAHIR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_L_TAMBAH_LAHIR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_P_TAMBAH_LAHIR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_L_TAMBAH_MASUK'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_P_TAMBAH_MASUK'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_L_TAMBAH_MASUK'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_P_TAMBAH_MASUK'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_L_KURANG_MATI'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_P_KURANG_MATI'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_L_KURANG_MATI'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_P_KURANG_MATI'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_L_KURANG_KELUAR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_P_KURANG_KELUAR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_L_KURANG_KELUAR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_P_KURANG_KELUAR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_L_AKHIR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNA_P_AKHIR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_L_AKHIR'],'-') ?></td>
+										<td><?= show_zero_as($data['WNI_P_AKHIR'],'-') ?></td>
+										<td><?= show_zero_as($data['KK_AKHIR_JML'],'-') ?></td>
+										<td><?= show_zero_as($data['KK_AKHIR_ANG_KEL'],'-') ?></td>
+										<td><?= show_zero_as($data['KK_AKHIR_JML']+$data['KK_AKHIR_ANG_KEL'],'-') ?></td>
+										<td>-</td>
 									</tr>
 								<?php endforeach; ?>
-								<tfoot>
-									<tr class="bg-gray color-palette">
-										<th class="padat" colspan="2">TOTAL</th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_AWAL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_AWAL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_AWAL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_AWAL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['KK_JLH'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['KK_ANG_KEL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['JLH_JIWA_1'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_TAMBAH_LAHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_TAMBAH_LAHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_TAMBAH_LAHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_TAMBAH_LAHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_TAMBAH_MASUK'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_TAMBAH_MASUK'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_TAMBAH_MASUK'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_TAMBAH_MASUK'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_KURANG_MATI'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_KURANG_MATI'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_KURANG_MATI'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_KURANG_MATI'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_KURANG_KELUAR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_KURANG_KELUAR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_KURANG_KELUAR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_KURANG_KELUAR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_L_AKHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNA_P_AKHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_L_AKHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['WNI_P_AKHIR'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['KK_AKHIR_JML'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['KK_AKHIR_ANG_KEL'], '-') ?></th>
-										<th class="padat"><?= show_zero_as($totals['JLH_JIWA_2'], '-') ?></th>
-										<th class="padat">-</th>
-									</tr>
-
-								</tfoot>
 							<?php else: ?>
 								<tr>
 									<td class="text-center" colspan="33">Data Tidak Tersedia</td>
@@ -320,8 +220,15 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</div>
 	</div>
 </div>
-<?php else:
-
-    $this->load->view('bumindes/penduduk/rekapitulasi/data_lengkap', ['judul_rekap' => 'Buku Rekapitulasi Penduduk']);
-
-endif; ?>
+<?php else: ?>
+	<div class="box box-info">
+		<div class="box-header with-border">
+		</div>
+		<div class="box-body">
+			<div class="alert alert-warning">
+				Buku Rekapitulasi Penduduk masih dalam proses dilengkapi.<br>
+				Buka <a href="<?=site_url('setting')?>">Pengaturan > Aplikasi</a> untuk melengkapi tanggal lengkap data.
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
