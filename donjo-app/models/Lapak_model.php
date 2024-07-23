@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * File ini:
@@ -74,24 +74,23 @@ class Lapak_model extends MY_Model
 	{
 		$this->produk();
 
-		if ($search)
-		{
+		if ($search) {
 			$this->db
 				->group_start()
-					->like('p.nama', $search)
-					->or_like('pr.nama', $search)
-					->or_like('pk.kategori', $search)
-					->or_like('pr.harga', $search)
-					->or_like('pr.satuan', $search)
-					->or_like('pr.potongan', $search)
-					->or_like('pr.deskripsi', $search)
+				->like('p.nama', $search)
+				->or_like('pr.nama', $search)
+				->or_like('pk.kategori', $search)
+				->or_like('pr.harga', $search)
+				->or_like('pr.satuan', $search)
+				->or_like('pr.potongan', $search)
+				->or_like('pr.deskripsi', $search)
 				->group_end();
 		}
 
 		if ($status) $this->db->where('pr.status', $status);
 		if ($id_pend) $this->db->where('p.id', $id_pend);
 		if ($id_produk_kategori) $this->db->where('pk.id', $id_produk_kategori);
-		
+
 		return $this->db;
 	}
 
@@ -147,8 +146,7 @@ class Lapak_model extends MY_Model
 		$post = $this->input->post();
 
 		$foto = [];
-		for ($i = 0; $i < $this->setting->banyak_foto_tiap_produk; $i++)
-		{
+		for ($i = 0; $i < $this->setting->banyak_foto_tiap_produk; $i++) {
 			$value = $this->upload_foto_produk($i + 1);
 			if ($value == NULL) continue;
 			$foto[] = $value;
@@ -163,7 +161,7 @@ class Lapak_model extends MY_Model
 			'tipe_potongan' => bilangan($post['tipe_potongan']),
 			'potongan' => bilangan(($post['tipe_potongan'] == 1) ? $post['persen'] : $post['nominal']),
 			'deskripsi' => $this->security->xss_clean($post['deskripsi']),
-			
+
 			'foto' => ($foto == []) ? NULL : json_encode($foto)
 		];
 
@@ -179,23 +177,19 @@ class Lapak_model extends MY_Model
 			'max_size' => max_upload() * 1024,
 		];
 		// Adakah berkas yang disertakan?
-		if (empty($_FILES["foto_$key"]['name']))
-		{
+		if (empty($_FILES["foto_$key"]['name'])) {
 			// Jika hapus (ceklis)
-			if (isset($_POST["hapus_foto_$key"]))
-			{
+			if (isset($_POST["hapus_foto_$key"])) {
 				unlink(LOKASI_PRODUK . $this->input->post("old_foto_$key"));
 
 				return NULL;
 			}
 
 			return $this->input->post("old_foto_$key");
-		}		
+		}
 
 		// Tes tidak berisi script PHP
-		if (isPHP($_FILES['logo']['tmp_name'], $_FILES["foto_$key"]['name']))
-
-		{
+		if (isPHP($_FILES['logo']['tmp_name'], $_FILES["foto_$key"]['name'])) {
 			$this->session->success = -1;
 			$this->session->error_msg = " -> Jenis file ini tidak diperbolehkan ";
 			redirect('produk');
@@ -205,8 +199,7 @@ class Lapak_model extends MY_Model
 		// Inisialisasi library 'upload'
 		$this->upload->initialize($this->uploadConfig);
 		// Upload sukses
-		if ($this->upload->do_upload("foto_$key"))
-		{
+		if ($this->upload->do_upload("foto_$key")) {
 			$uploadData = $this->upload->data();
 			// Buat nama file unik agar url file susah ditebak dari browser
 			$namaFileUnik = tambahSuffixUniqueKeNamaFile($uploadData['file_name']);
@@ -222,13 +215,12 @@ class Lapak_model extends MY_Model
 			unlink(LOKASI_PRODUK . $this->input->post("old_foto_$key"));
 		}
 		// Upload gagal
-		else
-		{
+		else {
 			$this->session->success = -1;
 			$this->session->error_msg = $this->upload->display_errors(NULL, NULL);
 		}
 
-		return ( ! empty($uploadData)) ? $uploadData['file_name'] : NULL;
+		return (!empty($uploadData)) ? $uploadData['file_name'] : NULL;
 	}
 
 	public function produk_delete($id = 0)
@@ -243,8 +235,7 @@ class Lapak_model extends MY_Model
 	public function produk_delete_all()
 	{
 		$id_cb = $_POST['id_cb'];
-		foreach ($id_cb as $id)
-		{
+		foreach ($id_cb as $id) {
 			$this->produk_delete($id);
 		}
 	}
@@ -254,16 +245,14 @@ class Lapak_model extends MY_Model
 		// Hapus semua foto produk jika produk/kategori/pelapak dihapus agar tidak meninggalkan sampah
 		$list_data = $this->db->select('foto')->get_where('produk', [$where => $value])->result();
 
-		if ( ! $list_data) return;
+		if (!$list_data) return;
 
-		foreach ($list_data as $data)
-		{
+		foreach ($list_data as $data) {
 			$foto = json_decode($data->foto);
 
-			for ($i = 0; $i < count($foto); $i++)
-			{
+			for ($i = 0; $i < count($foto); $i++) {
 				unlink(LOKASI_PRODUK . $foto[$i]);
-			}	
+			}
 		}
 	}
 
@@ -280,12 +269,11 @@ class Lapak_model extends MY_Model
 	{
 		$this->pelapak();
 
-		if ($search)
-		{
+		if ($search) {
 			$this->db
 				->group_start()
-					->like('p.nama', $search)
-					->or_like('lp.telepon', $search)
+				->like('p.nama', $search)
+				->or_like('lp.telepon', $search)
 				->group_end();
 		}
 
@@ -366,9 +354,9 @@ class Lapak_model extends MY_Model
 
 	public function pelapak_delete($id = 0)
 	{
-		
+
 		$this->hapus_foto_produk('id_pelapak', $id);
-		
+
 
 		$outp = $this->db->where('id', $id)->delete('pelapak');
 
@@ -378,8 +366,7 @@ class Lapak_model extends MY_Model
 	public function pelapak_delete_all()
 	{
 		$id_cb = $_POST['id_cb'];
-		foreach ($id_cb as $id)
-		{
+		foreach ($id_cb as $id) {
 			$this->pelapak_delete($id);
 		}
 	}
@@ -402,7 +389,7 @@ class Lapak_model extends MY_Model
 			->result();
 		foreach ($data_array as $value) {
 
-			if ( ! in_array($value->satuan, $this->list_satuan)) array_push($this->list_satuan, $value->satuan);
+			if (!in_array($value->satuan, $this->list_satuan)) array_push($this->list_satuan, $value->satuan);
 		}
 		usort($this->list_satuan, 'strnatcasecmp');
 		return $this->list_satuan;
@@ -464,8 +451,7 @@ class Lapak_model extends MY_Model
 	public function kategori_delete_all()
 	{
 		$id_cb = $_POST['id_cb'];
-		foreach ($id_cb as $id)
-		{
+		foreach ($id_cb as $id) {
 			$this->kategori_delete($id);
 		}
 	}
@@ -490,5 +476,4 @@ class Lapak_model extends MY_Model
 
 		status_sukses($outp);
 	}
-
 }
